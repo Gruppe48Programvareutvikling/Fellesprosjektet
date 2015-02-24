@@ -21,7 +21,7 @@ public class TestClass extends ServerManager {
 //			}
 			System.out.println("Worked");
 		} catch (SQLException e) {
-			System.out.println(e);
+			this.processSQLException(e);
 		}
 	}
 	
