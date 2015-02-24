@@ -1,5 +1,11 @@
 
-public class TestClass {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+
+public class TestClass extends ServerManager {
 	TestClass() {
 //		ResultSet result = null;
 		try (Connection connection = this.getDataBaseConnection();
