@@ -24,8 +24,4 @@ public class TestClass extends ServerManager {
 			System.out.println(e);
 		}
 	}
-	
-	public static void main(String[] args) {
-		TestClass var = new TestClass();
-	}
 }
