@@ -2,6 +2,8 @@ package pipeCreateUser;
 
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
+import serverReturnTypes.ServerAvailabilityResult;
+import superClasses.ServerResult;
 import superClasses.SuperUser;
 
 public class UserCreateUser extends SuperUser {
@@ -23,10 +25,18 @@ public class UserCreateUser extends SuperUser {
 	public void sendNextInput(String nextInput) {
 		switch (this.state) {
 		case ENTER_USERNAME:
-			// CHECK WITH THE SERVER IF THE USERNAME ALREADY EXISTS. CURRENTLY ASSUMING IT'S AVAILABLE
-			this.userConstructor.username = nextInput;
-			this.state = State.ENTER_PASSWORD;
-			this.delegator.delegateIsReadyForNextInputWithPrompt("What do you want your password to be");
+			ServerAvailabilityResult availability = this.server.checkIfUsernameIsAvailable(nextInput);
+			if (availability.isAvailable) {
+				this.userConstructor.username = nextInput;
+				this.state = State.ENTER_PASSWORD;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("What do you want your password to be");
+			} else {
+				if (availability.didSucceed) {
+					this.delegator.delegateIsReadyForNextInputWithPrompt("That username already exists. Try another one");
+				} else {
+					this.delegator.delegateIsReadyForNextInputWithPrompt("There was an error with the message \"" + availability.errorMessage + "\"\nTry again");
+				}
+			}
 			break;
 		case ENTER_PASSWORD:
 			this.userConstructor.password = nextInput;
@@ -40,8 +50,12 @@ public class UserCreateUser extends SuperUser {
 			break;
 		case ENTER_PHONE_NUMBER:
 			this.userConstructor.phoneNumber = nextInput;
-			// SEND THIS USER TO THE SERVER
-			this.delegator.delegateIsDone("You have successfully created a user");
+			ServerResult result = this.server.createUser(this.userConstructor);
+			if (result.didSucceed) {
+				this.delegator.delegateIsDone("You have successfully created a user");
+			} else {
+				this.delegator.delegateIsDone("There was an error creating the user with the message \"" + result.errorMessage + "\"");
+			}
 			break;
 		}
 	}
