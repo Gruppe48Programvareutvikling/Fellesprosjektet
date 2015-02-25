@@ -12,6 +12,10 @@ public class UserLogin extends SuperUser {
 		this.delegator.delegateIsDone("UserLogin is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}

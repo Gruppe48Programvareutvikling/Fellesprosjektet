@@ -12,6 +12,10 @@ public class UserGetNotifications extends SuperUser {
 		this.delegator.delegateIsDone("UserGetNotifications is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}
