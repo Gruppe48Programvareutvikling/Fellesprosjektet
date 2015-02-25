@@ -1,8 +1,11 @@
+package mainControlStructure;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import superClasses.ServerManager;
 
 
 public class TestClass extends ServerManager {
