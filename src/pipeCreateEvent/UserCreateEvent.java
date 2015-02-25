@@ -12,6 +12,10 @@ public class UserCreateEvent extends SuperUser {
 		this.delegator.delegateIsDone("UserCreateEvent is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}

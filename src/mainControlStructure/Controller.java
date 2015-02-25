@@ -67,7 +67,12 @@ public class Controller implements ControllerInterface {
 		String nextInput = this.inputScanner.nextLine();
 		
 		if (this.delegate != null) {
-			this.delegate.sendNextInput(nextInput);
+			// The help command comes before everything else
+			if (nextInput.equals(COMMAND_HELP)) {
+				this.delegate.userAsksForHelp();
+			} else { 
+				this.delegate.sendNextInput(nextInput);
+			}
 		} else {
 			// nextInput is not going to be used for anything other than to check against valid commands.
 			// That will be easier to do if everything is lowercase.
@@ -131,6 +136,10 @@ public class Controller implements ControllerInterface {
 					this.mainLoopWithPrompt(null);
 					break;
 				}
+			}
+			
+			if (this.delegate != null) {
+				this.delegate.startRunning();
 			}
 		}
 	}

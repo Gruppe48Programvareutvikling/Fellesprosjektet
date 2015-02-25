@@ -12,6 +12,10 @@ public class UserCreateGroup extends SuperUser {
 		this.delegator.delegateIsDone("UserCreateGroup is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}
