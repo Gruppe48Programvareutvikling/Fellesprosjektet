@@ -1,8 +1,11 @@
+package mainControlStructure;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import superClasses.ServerManager;
 
 
 public class TestClass extends ServerManager {
@@ -21,8 +24,9 @@ public class TestClass extends ServerManager {
 //			}
 			System.out.println("Worked");
 		} catch (SQLException e) {
-			System.out.println(e);
-			// This is a comment
+
+			this.processSQLException(e);
+
 		}
 	}
 }
