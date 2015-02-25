@@ -12,6 +12,10 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 		this.delegator.delegateIsDone("UserRespondToDistributedInvitations is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}

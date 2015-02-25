@@ -12,6 +12,10 @@ public class UserCheckAvailability extends SuperUser {
 		this.delegator.delegateIsDone("UserCheckAvailability is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}

@@ -12,6 +12,10 @@ public class UserEventsForTheDay extends SuperUser {
 		this.delegator.delegateIsDone("UserEventsForTheDay is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}

@@ -12,6 +12,10 @@ public class UserEditEvent extends SuperUser {
 		this.delegator.delegateIsDone("UserEditEvent is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}
