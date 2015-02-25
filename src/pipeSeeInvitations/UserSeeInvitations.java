@@ -12,6 +12,10 @@ public class UserSeeInvitations extends SuperUser {
 		this.delegator.delegateIsDone("UserSeeInvitations is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}

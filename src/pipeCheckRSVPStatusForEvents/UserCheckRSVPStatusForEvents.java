@@ -12,6 +12,10 @@ public class UserCheckRSVPStatusForEvents extends SuperUser {
 		this.delegator.delegateIsDone("UserCheckRSVPStatusForEvents is done");
 	}
 	
+	public void startRunning() {
+		
+	}
+	
 	public void sendNextInput(String nextInput) {
 		
 	}
