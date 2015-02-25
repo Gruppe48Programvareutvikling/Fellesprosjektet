@@ -1,6 +1,7 @@
 package superClasses;
 
 // Abstract superclass for the rest of the return types
-public abstract class ServerResult {
-
+public class ServerResult {
+	public boolean didSucceed;
+	public String errorMessage;
 }
