@@ -12,8 +12,8 @@ import superClasses.ServerResult;
 
 public class ServerCreateUser extends ServerManager {
 	
-	private final String SQL_CHECK_IF_USER_IS_AVAILABLE = "Select userName from User where userName = ?";
-	private final String SQL_CREATE_USER				= "insert into User(userName, password, mail, phone) values (?,?,?,?)";
+	private final String SQL_CHECK_IF_USER_IS_AVAILABLE = "SELECT userName FROM User WHERE userName=?";
+	private final String SQL_CREATE_USER				= "INSERT INTO User(userName, password, mail, phone) VALUES (?,?,?,?)";
 	
 	public ServerAvailabilityResult checkIfUsernameIsAvailable(String usernameToCheck) {
 		ServerAvailabilityResult theResult = new ServerAvailabilityResult();
