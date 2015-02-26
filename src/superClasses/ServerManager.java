@@ -24,8 +24,8 @@ public abstract class ServerManager {
 	 * @param e The exception to print
 	 */
 	protected static void processSQLException(SQLException e) {
-		System.err.println("Error message: " + e.getMessage());
-		System.err.println("Error code: " + e.getErrorCode());
-		System.err.println("SQL state: " + e.getSQLState());
+		System.out.println("Error message: " + e.getMessage());
+		System.out.println("Error code: " + e.getErrorCode());
+		System.out.println("SQL state: " + e.getSQLState());
 	}
 }
