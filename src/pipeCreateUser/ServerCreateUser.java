@@ -64,13 +64,14 @@ public class ServerCreateUser extends ServerManager {
 			statement.setString(2, userToCreate.password);
 			statement.setString(3, userToCreate.mail);
 			statement.setString(4, userToCreate.phoneNumber);
-			result = statement.executeQuery();
+			int affected = statement.executeUpdate();
 			
-			while (result.next()) {
-//				lostItems.put(result.getString("phone"), result.getString("lostItems"));
-				
-				// Set the availability result
-			}			
+			if (affected == 1) {
+				theResult.didSucceed = true;
+			} else {
+				theResult.didSucceed = false;
+				theResult.errorMessage = "Unknown error while creating user";
+			}
 		} catch (SQLException e) {
 			ServerCreateUser.processSQLException(e);
 			
