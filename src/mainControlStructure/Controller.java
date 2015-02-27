@@ -118,6 +118,7 @@ public class Controller implements ControllerInterface {
 				case COMMAND_LOGOUT:
 					this.userIsLoggedIn = false;
 					System.out.println("You have successfully logged out");
+					this.mainLoopWithPrompt(null);
 					break;
 				case COMMAND_HELP:
 					this.userAsksForHelp();
