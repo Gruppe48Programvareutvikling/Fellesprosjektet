@@ -64,6 +64,7 @@ public class Controller implements ControllerInterface {
 	public void delegateDidLogInUser() {
 		this.userIsLoggedIn = true;
 		System.out.println("YOU ARE LOGGED IN");
+		
 	}
 	
 	
