@@ -58,6 +58,11 @@ public class Controller implements ControllerInterface {
 		this.mainLoopWithPrompt(promptToUser);
 	}
 	
+	public void delegateDidLogInUser() {
+		this.userIsLoggedIn = true;
+		System.out.println("YOU ARE LOGGED IN");
+	}
+	
 	
 	
 	
