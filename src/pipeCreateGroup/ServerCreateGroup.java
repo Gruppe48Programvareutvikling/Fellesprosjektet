@@ -13,10 +13,10 @@ import superClasses.ServerResult;
 
 public class ServerCreateGroup extends ServerManager {
 
-	private final String SQL_CHECK_IF_GROUP_IS_AVAILABLE = "SELECT groupName FROM Group WHERE groupName=?";
+	private final String SQL_CHECK_IF_GROUP_IS_AVAILABLE = "SELECT groupName FROM `Group` WHERE groupName=?";
 	private final String SQL_CHECK_IF_USER_IS_IN_DB = "SELECT userName FROM User WHERE userName=?";
-	private final String SQL_CHECK_IF_GROUP_IS_IN_DB = "SELECT groupName FROM Group WHERE groupName=?";
-	private final String SQL_CREATE_GROUP			= "INSERT INTO Group(groupName) VALUES (?)";
+	private final String SQL_CHECK_IF_GROUP_IS_IN_DB = "SELECT groupName FROM `Group` WHERE groupName=?";
+	private final String SQL_CREATE_GROUP			= "INSERT INTO `Group`(groupName) VALUES (?)";
 	private final String SQL_INSERT_SUPERGROUP		= "update `Group` set superGroup = ? where groupName = ?";
 
 

@@ -20,7 +20,6 @@ public class UserCreateGroup extends SuperUser {
 		this.delegator = delegator;
 
 		System.out.println("The UserCreateGroup class was initialized. Will return immediately");
-		this.delegator.delegateIsDone("UserCreateGroup is done");
 	}
 
 	public void startRunning() {
