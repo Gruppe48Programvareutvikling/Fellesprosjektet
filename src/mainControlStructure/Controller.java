@@ -50,7 +50,10 @@ public class Controller implements ControllerInterface {
 	
 	public void delegateIsDone(String successMessage) {
 		this.delegate = null;
-		System.out.println(successMessage);
+		if (successMessage!= null && successMessage.length() > 0){
+			System.out.println(successMessage);
+		}
+		
 		this.mainLoopWithPrompt(null);
 	}
 	

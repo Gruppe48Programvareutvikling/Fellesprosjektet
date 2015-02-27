@@ -35,15 +35,15 @@ public class UserLogin extends SuperUser {
 			if(availability.didSucceed == true){
 				if(availability.isAvailable == true){
 					this.delegator.delegateDidLogInUser();
-					this.delegator.delegateIsDone("");
+					this.delegator.delegateIsDone(null);
 				}else{
-					
-					if(count == 1){
+					count--;
+					if(count == 0){
 						this.delegator.delegateIsDone("You have tried to log in too many times. You will be returned to the starting screen");
 						
 					}
 					else{
-						count--;
+						
 						this.state = State.ENTER_USERNAME;
 						this.delegator.delegateIsReadyForNextInputWithPrompt("Wrong username or password, you have " + count + " tries left\nTry again\nUsername");
 					}
