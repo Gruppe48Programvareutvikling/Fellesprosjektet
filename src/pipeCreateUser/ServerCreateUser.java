@@ -14,6 +14,7 @@ public class ServerCreateUser extends ServerManager {
 	
 	private final String SQL_CHECK_IF_USER_IS_AVAILABLE = "SELECT userName FROM User WHERE userName=?";
 	private final String SQL_CREATE_USER				= "INSERT INTO User(userName, password, mail, phone) VALUES (?,?,?,?)";
+	private final String SQL_CREATE_PrivateCalendar		= "INSERT INTO PrivateCalendar(privateCalendarName, userName) VALUES (?,?)";
 	
 	public ServerAvailabilityResult checkIfUsernameIsAvailable(String usernameToCheck) {
 		ServerAvailabilityResult theResult = new ServerAvailabilityResult();
@@ -68,6 +69,7 @@ public class ServerCreateUser extends ServerManager {
 			
 			if (affected == 1) {
 				theResult.didSucceed = true;
+				createPrivateCalendar(userToCreate.username);
 			} else {
 				theResult.didSucceed = false;
 				theResult.errorMessage = "Unknown error while creating user";
@@ -80,5 +82,29 @@ public class ServerCreateUser extends ServerManager {
 		}
 		
 		return theResult;
+	}
+	private void createPrivateCalendar(String username){
+		ServerResult theResult = new ServerResult();
+		try(Connection connection = this.getDataBaseConnection();
+			PreparedStatement statement = connection.prepareStatement(SQL_CREATE_PrivateCalendar, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			) 
+		{
+			statement.setString(1, username + "'s Calendar");
+			statement.setString(2, username);
+			int affected = statement.executeUpdate();
+			if (affected == 1){
+				theResult.didSucceed = true;
+			}
+			else{
+				theResult.didSucceed = false;
+				theResult.errorMessage = "Unknow error while creating private calendar";
+			}
+			
+		} catch (SQLException e) {
+			theResult.didSucceed = false;
+			theResult.errorMessage = e.getMessage();
+			
+		}
+		
 	}
 }
