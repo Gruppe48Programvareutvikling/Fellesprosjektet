@@ -54,7 +54,6 @@ public class ServerCreateUser extends ServerManager {
 	public ServerResult createUser(User userToCreate) {
 		ServerResult theResult = new ServerResult();
 		
-		ResultSet result = null;
 		try (
 				Connection connection = this.getDataBaseConnection();
 				PreparedStatement statement = connection.prepareStatement(SQL_CREATE_USER, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
