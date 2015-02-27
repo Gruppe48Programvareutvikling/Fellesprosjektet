@@ -50,12 +50,20 @@ public class Controller implements ControllerInterface {
 	
 	public void delegateIsDone(String successMessage) {
 		this.delegate = null;
-		System.out.println(successMessage);
+		if (successMessage!= null && successMessage.length() > 0){
+			System.out.println(successMessage);
+		}
+		
 		this.mainLoopWithPrompt(null);
 	}
 	
 	public void delegateIsReadyForNextInputWithPrompt(String promptToUser) {
 		this.mainLoopWithPrompt(promptToUser);
+	}
+	
+	public void delegateDidLogInUser() {
+		this.userIsLoggedIn = true;
+		System.out.println("YOU ARE LOGGED IN");
 	}
 	
 	
@@ -110,6 +118,7 @@ public class Controller implements ControllerInterface {
 				case COMMAND_LOGOUT:
 					this.userIsLoggedIn = false;
 					System.out.println("You have successfully logged out");
+					this.mainLoopWithPrompt(null);
 					break;
 				case COMMAND_HELP:
 					this.userAsksForHelp();
