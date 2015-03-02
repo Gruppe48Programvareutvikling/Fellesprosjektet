@@ -13,6 +13,7 @@ public class UserEventsForTheDay extends SuperUser {
 	}
 	
 	public void startRunning() {
+		this.delegator.delegateIsReadyForNextInputWithPrompt(");
 		
 	}
 	
