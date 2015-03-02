@@ -1,7 +1,7 @@
 package pipeCheckRSVPStatusForEvents;
 
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerAvailabilityResult;
+import serverReturnTypes.ServerRSVPStatusesResult;
 import superClasses.SuperUser;
 
 public class UserCheckRSVPStatusForEvents extends SuperUser {
@@ -24,12 +24,12 @@ public class UserCheckRSVPStatusForEvents extends SuperUser {
 	public void sendNextInput(String nextInput) {
 		switch(this.state){
 		case SET_EVENT_TO_CHECK:
-			ServerAvailabilityResult availability = this.server.checkIfEventExist(nextInput);
+			ServerRSVPStatusesResult availability = this.server.checkIfEventExist(nextInput);
 			if (!availability.didSucceed){
 				this.delegator.delegateIsReadyForNextInputWithPrompt("There was an error with the message \"" + availability.errorMessage + "\"\nTry again");
 			}
 			if (availability.isAvailable){
-				this.delegator.delegateIsDone("Checking RSVP status for event was succsessful");
+				this.delegator.delegateIsDone(availability.toString());
 			}
 			else{
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The eventId doesent exist. Try a another eventId");
