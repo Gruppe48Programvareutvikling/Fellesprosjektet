@@ -1,9 +1,12 @@
 package pipeGetNotifications;
 
+import dataStructures.Notification;
 import mainControlStructure.ControllerInterface;
 import superClasses.SuperUser;
 
 public class UserGetNotifications extends SuperUser {
+	
+	private Notification notification = new Notification();
 	
 	public UserGetNotifications(ControllerInterface delegator) {
 		this.delegator = delegator;
