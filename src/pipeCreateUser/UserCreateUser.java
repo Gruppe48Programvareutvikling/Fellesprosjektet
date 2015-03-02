@@ -8,6 +8,8 @@ import superClasses.SuperUser;
 
 public class UserCreateUser extends SuperUser {
 	
+	public static final String PROMPT_AFTER_START_RUNNING = "What do you want your username to be";
+	
 	private enum State {ENTER_USERNAME, ENTER_PASSWORD, ENTER_MAIL, ENTER_PHONE_NUMBER}
 	
 	private State state = State.ENTER_USERNAME;
@@ -19,7 +21,7 @@ public class UserCreateUser extends SuperUser {
 	}
 	
 	public void startRunning() {
-		this.delegator.delegateIsReadyForNextInputWithPrompt("What do you want your username to be");
+		this.delegator.delegateIsReadyForNextInputWithPrompt(this.PROMPT_AFTER_START_RUNNING);
 	}
 	
 	public void sendNextInput(String nextInput) {
