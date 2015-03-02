@@ -12,7 +12,7 @@ public class Event {
 	public Date date;
 	public Double duration;
 	public Room room;
-	public String uid;
+	public String eventId;
 	
 
 }
