@@ -8,8 +8,8 @@ public class Event {
 	
 	public String name;
 	public String description;
-	public Date date;
-	public double duration;
+	public Date startDate;
+	public Date	endDate;
 	public Room room;
 	public String eventId;
 	public List<User> participants = new ArrayList<User>();

@@ -3,16 +3,21 @@ package pipeCreateEvent;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.hamcrest.core.SubstringMatcher;
+
 import javafx.scene.web.PromptData;
 import dataStructures.Event;
+import dataStructures.User;
 import mainControlStructure.ControllerInterface;
+import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
+import serverReturnTypes.ServerRoomResult;
 import superClasses.ServerResult;
 import superClasses.SuperUser;
 
 public class UserCreateEvent extends SuperUser {
-	private enum State{ENTER_NAME, ENTER_DESCRIPTION, ENTER_DAY, ENTER_MONTH, ENTER_YEAR, ENTER_DURATION, ENTER_CALENDAR,
-		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ENTER_ROOM_NUMBER}
+	private enum State{ENTER_NAME, ENTER_DESCRIPTION, ENTER_STARTDATE, ENTER_DAY, ENTER_MONTH, ENTER_YEAR, ENTER_CLOCK, ENTER_CALENDAR,
+		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_ROOM_NUMBER}
 	State state = State.ENTER_NAME;
 	private Event eventConstructor = new Event();
 	private ServerCreateEvent server = new ServerCreateEvent();
@@ -50,55 +55,51 @@ public class UserCreateEvent extends SuperUser {
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The description was too long. Please write a shorter name");
 			}
 			break;
-		case ENTER_YEAR:
-			try{int year = Integer.parseInt(nextInput);
 			
+		case ENTER_STARTDATE: //kommer inn som dd/mm/yyyy
+			int counter = 0;
+			for( int i=0; i<nextInput.length(); i++ ) {
+			    if( nextInput.charAt(i) == '/' ) {
+			        counter++;
+			    } 
+			}
+			if (counter !=2){
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Wrong format. Please try again. dd/mm/yyyy");
+			}
+			String[] date = nextInput.split("/");
+			String sDay = date[0];
+			String sMonth = date[1];
+			String sYear = date[2];
+		
 			
+			try{
+				int day = Integer.parseInt(sDay);
+				int month = Integer.parseInt(sMonth);
+				int year = Integer.parseInt(sYear);
 				if (year>0){
-					this.eventConstructor.date.setYear(year-1900);
-					this.state = State.ENTER_MONTH;
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the month  (1-12)");
-			
+					this.eventConstructor.startDate.setYear(year-1900);
 				}
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write a plausible year");
-				}catch(NumberFormatException e){
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the year with digits");
-				}
-			break;
-		case ENTER_MONTH:
-			try{
-				int month = Integer.parseInt(nextInput);
 				if (month >=1 && month <=12){
-					this.eventConstructor.date.setMonth(month);
-					this.state = State.ENTER_DAY;
-					Calendar cal = new GregorianCalendar(this.eventConstructor.date.getYear(), month, 1);
+					this.eventConstructor.startDate.setMonth(month);
+				
+					Calendar cal = new GregorianCalendar(this.eventConstructor.startDate.getYear(), month, 1);
 					daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the day of your event (1-" + daysInMonth + ")");
-				
-				}else{
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the correct month (mm)");
-				}
-			}catch(NumberFormatException e){
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the month with 2 digits");
-			}
-			break;
-		case ENTER_DAY:
-			try{
-				int day = Integer.parseInt(nextInput);
-				
-				if (day>=1 && day <= daysInMonth){
-					this.eventConstructor.date.setDate(day);
-					this.state = State.ENTER_DURATION;
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the duration of the event in min");
-				}else{
-					this.delegator.delegateIsReadyForNextInputWithPrompt("This date does not exist. Please try again");
-				}
-			}catch(NumberFormatException e){
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the day as a number");
-			}
-			break;
+					if (day <= daysInMonth && day >0 ){
+						this.eventConstructor.startDate.setDate(day);
+						this.state = State.ENTER_CLOCK;
+						this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the time of the day");
 			
-		case ENTER_DURATION:
+						break;
+					}
+				}
+				else{this.delegator.delegateIsReadyForNextInputWithPrompt("Date does not exist");
+				
+				}
+				}catch (NumberFormatException e){
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Please use numbers");
+			}
+			
+		case ENTER_CLOCK:
 			if (nextInput.length()<= 11 ){
 				try{
 					double duration = Double.parseDouble(nextInput);
@@ -130,18 +131,52 @@ public class UserCreateEvent extends SuperUser {
 			if (nextInput.length()<=45){
 				this.eventConstructor.location = nextInput;
 				this.state = State.ENTER_Participants;
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the usernames of the participants");
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of the participant");
 			}else {
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of your location was too long, please try again");
 			}
 			break;
 		case ENTER_Participants:
 			if (nextInput.length() <= 45){
-				if (nextInput == "y" || nextInput == "Y"){
-					this.eventConstructor.participants.add(nextInput);
+					//skjekk med server
+					ServerFindUserResult result = this.server.findUser(nextInput);
+					if (result.userExists == true){
+						this.eventConstructor.participants.add(new User(nextInput));
+						this.state = State.ADD_MORE;
+						this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants Y/N?");
+					
+					}else{
+						this.state = State.ADD_MORE;
+						this.delegator.delegateIsReadyForNextInputWithPrompt("This user does not exist, want to try again Y/N?");
 				
-				}
+					}
+			}else{
+				this.state = State.ADD_MORE;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Username was too long, want to try again Y/N?");
+		
 			}
+			break;
+		case ADD_MORE:
+			if (nextInput == "Y" || nextInput == "y"){
+				this.state = State.ENTER_Participants;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of the participant");
+			}
+			if (nextInput == "N" || nextInput == "n"){
+				this.state = State.ENTER_ROOM_NUMBER;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the number of desired seats");
+			}else{
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write Y/N");
+			}
+			break;
+		case ENTER_ROOM_NUMBER:
+			if (nextInput.length() <= 11)
+				try{
+					int numberOfSeats = Integer.parseInt(nextInput);
+					ServerRoomResult result = this.server.				//TIME + Duration
+				}catch (NumberFormatException e){
+					
+				}
+			
 		}
 		
 	}
