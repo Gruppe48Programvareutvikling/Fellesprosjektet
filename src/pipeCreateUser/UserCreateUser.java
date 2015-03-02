@@ -59,6 +59,8 @@ public class UserCreateUser extends SuperUser {
 				this.delegator.delegateIsDone("There was an error creating the user with the message \"" + result.errorMessage + "\"");
 			}
 			break;
+		default:
+			break;
 		}
 	}
 	
