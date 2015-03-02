@@ -10,7 +10,7 @@ import superClasses.ServerManager;
 
 public class ServerGetNotifications extends ServerManager {
 	
-	private final String SQL_GET_NOTIFICATIONS = "SELECT date, message FROM Notification WHERE userName=?";
+	private final String SQL_GET_NOTIFICATIONS = "SELECT date, message FROM Notification WHERE userName=? order by notificationId desc Limit 10";
 
 	
 	public ServerAvailabilityResult getNotifications(String username){
