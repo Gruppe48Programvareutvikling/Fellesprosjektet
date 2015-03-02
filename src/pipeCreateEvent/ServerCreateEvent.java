@@ -14,6 +14,7 @@ import superClasses.ServerResult;
 
 public class ServerCreateEvent extends ServerManager {
 	private final String SQL_FIND_USER = "Select userName from User where userName =?";
+	private final String SQL_FIND_GROUPS_FROM_USERNAME = "Select groupName from ";
 	public ServerResult createEvent(Event event){
 		return null;
 		
@@ -56,5 +57,7 @@ public class ServerCreateEvent extends ServerManager {
 		
 		return theResult;
 	}
-	public ServerRoomResult findRoom
+	public ServerRoomResult findRoomResult(){
+		return null;
+	}
 }
