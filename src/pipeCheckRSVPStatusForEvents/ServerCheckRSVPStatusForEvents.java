@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import serverReturnTypes.ServerAvailabilityResult;
+import serverReturnTypes.ServerRSVPStatusesResult;
 import superClasses.ServerEvents;
 import superClasses.ServerManager;
 
@@ -13,8 +13,8 @@ public class ServerCheckRSVPStatusForEvents extends ServerEvents {
 	
 	private final String SQL_CHECK_IF_EVENT_EXIST = "SELECT e.name, i.userName, status FROM InvitesToEvent i, Event e WHERE e.eventId = i.eventId AND i.eventId = ?";
 	
-	public ServerAvailabilityResult checkIfEventExist(String eventId){
-		ServerAvailabilityResult theResult = new ServerAvailabilityResult();
+	public ServerRSVPStatusesResult checkIfEventExist(String eventId){
+		ServerRSVPStatusesResult theResult = new ServerRSVPStatusesResult();
 		ResultSet result = null;
 
 		try(
@@ -31,11 +31,9 @@ public class ServerCheckRSVPStatusForEvents extends ServerEvents {
 				gotResult = true;
 				theResult.isAvailable = true;
 				theResult.didSucceed = true;
-				System.out.print(result.getString("name"));
-				System.out.print("  ");
-				System.out.print(result.getString("userName"));
-				System.out.print("  ");
-				System.out.println(result.getString("status"));
+				theResult.eventnames.add(result.getString("name"));
+				theResult.usernames.add(result.getString("userName"));
+				theResult.status.add(result.getString("status"));
 			}
 
 			if (gotResult == false){
