@@ -60,5 +60,5 @@ public class TestCreateUser extends TestCase implements ControllerInterface {
 		}
 	}
 	
-	public void delegateDidLogInUser() {}
+	public void delegateDidLogInUser(String username) {}
 }
