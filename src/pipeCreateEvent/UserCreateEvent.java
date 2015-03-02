@@ -12,7 +12,7 @@ import superClasses.SuperUser;
 
 public class UserCreateEvent extends SuperUser {
 	private enum State{ENTER_NAME, ENTER_DESCRIPTION, ENTER_DAY, ENTER_MONTH, ENTER_YEAR, ENTER_DURATION, ENTER_CALENDAR,
-		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_USERNAME, ENTER_ROOM_NUMBER}
+		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ENTER_ROOM_NUMBER}
 	State state = State.ENTER_NAME;
 	private Event eventConstructor = new Event();
 	private ServerCreateEvent server = new ServerCreateEvent();
@@ -105,7 +105,7 @@ public class UserCreateEvent extends SuperUser {
 					this.eventConstructor.duration = duration;
 					this.state = State.ENTER_CALENDAR;
 					
-					ServerGetCalendarsResult result = getListOfGroupsTheUserIsPartOf();
+					ServerGetCalendarsResult result = server.getListOfGroupsTheUserIsPartOf();
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Choose the calendar you want to put the event in");
 				}catch(NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the duration as a number"); //Må man skrive kommatall?
@@ -116,7 +116,32 @@ public class UserCreateEvent extends SuperUser {
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The duration is too long. Please write a shorter duration");
 			}
 			break;
-		case ENTER_CALENDAR
+		case ENTER_CALENDAR:
+			if (nextInput.length()<=45){
+				//Har valgt kalender
+				this.state = State.ENTER_LOCATION;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Write the location of you event");
+			}else{
+				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of the calendar was too long, try again");
+			}
+			
+			break;
+		case ENTER_LOCATION:
+			if (nextInput.length()<=45){
+				this.eventConstructor.location = nextInput;
+				this.state = State.ENTER_Participants;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the usernames of the participants");
+			}else {
+				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of your location was too long, please try again");
+			}
+			break;
+		case ENTER_Participants:
+			if (nextInput.length() <= 45){
+				if (nextInput == "y" || nextInput == "Y"){
+					this.eventConstructor.participants.add(nextInput);
+				
+				}
+			}
 		}
 		
 	}

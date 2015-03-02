@@ -15,5 +15,6 @@ public class Event {
 	public List<User> participants = new ArrayList<User>();
 	public List<User> group = new ArrayList<User>();
 	public double delayedAmount;
+	public String location;
 
 }
