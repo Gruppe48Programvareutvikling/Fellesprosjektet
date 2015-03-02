@@ -10,7 +10,7 @@ import superClasses.ServerManager;
 
 public class ServerGetNotifications extends ServerManager {
 	
-	private final String SQL_GET_NOTIFICATIONS = "SELECT date, message FROM Notifications WHERE userName=?";
+	private final String SQL_GET_NOTIFICATIONS = "SELECT date, message FROM Notification WHERE userName=?";
 
 	
 	public ServerAvailabilityResult getNotifications(String username){
@@ -31,8 +31,9 @@ public class ServerGetNotifications extends ServerManager {
 				gotResult = true;
 				theResult.isAvailable = true;
 				theResult.didSucceed = true;
-				System.out.println(result.getArray("date"));
-				System.out.println(result.getArray("message"));
+				System.out.print(result.getDate("date"));
+				System.out.print("  ");
+				System.out.println(result.getString("message"));
 			}
 
 			if (gotResult == false){
