@@ -2,6 +2,7 @@ package mainControlStructure;
 
 import java.util.Scanner;
 
+import dataStructures.User;
 import pipeCheckAvailability.UserCheckAvailability;
 import pipeCheckRSVPStatusForEvents.UserCheckRSVPStatusForEvents;
 import pipeCreateEvent.UserCreateEvent;
@@ -61,11 +62,11 @@ public class Controller implements ControllerInterface {
 		this.mainLoopWithPrompt(promptToUser);
 	}
 	
-	public void delegateDidLogInUser() {
+	public void delegateDidLogInUser(String username) {
 		this.userIsLoggedIn = true;
-		System.out.println("YOU ARE LOGGED IN");
-		
-	}
+		User.currentUser().username = username;
+		System.out.println("You are logged in as \"" + username + "\"");
+		}
 	
 	
 	
@@ -118,6 +119,7 @@ public class Controller implements ControllerInterface {
 					break;
 				case COMMAND_LOGOUT:
 					this.userIsLoggedIn = false;
+					User.currentUser().username = null;
 					System.out.println("You have successfully logged out");
 					this.mainLoopWithPrompt(null);
 					break;
