@@ -32,6 +32,8 @@ public class ServerGetNotifications extends ServerManager {
 				theResult.isAvailable = true;
 				theResult.didSucceed = true;
 				System.out.print(result.getDate("date"));
+				System.out.print(" ");
+				System.out.print(result.getTime("date"));
 				System.out.print("  ");
 				System.out.println(result.getString("message"));
 			}
