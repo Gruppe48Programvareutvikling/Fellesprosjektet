@@ -1,5 +1,7 @@
 package pipeGetNotifications;
 
+
+import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
 import serverReturnTypes.ServerNotificationsResult;
@@ -7,7 +9,11 @@ import superClasses.SuperUser;
 
 public class UserGetNotifications extends SuperUser {
 	
+
+	private Notification notification = new Notification();
+
 	private ServerGetNotifications server = new ServerGetNotifications();
+
 
 	
 	public UserGetNotifications(ControllerInterface delegator) {
