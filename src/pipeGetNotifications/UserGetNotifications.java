@@ -4,7 +4,7 @@ package pipeGetNotifications;
 import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerAvailabilityResult;
+import serverReturnTypes.ServerNotificationsResult;
 import superClasses.SuperUser;
 
 public class UserGetNotifications extends SuperUser {
@@ -22,7 +22,7 @@ public class UserGetNotifications extends SuperUser {
 	}
 	
 	public void startRunning() {
-		ServerAvailabilityResult notifications = this.server.getNotifications(User.currentUser().username);
+		ServerNotificationsResult notifications = this.server.getNotifications(User.currentUser().username);
 		if (!notifications.isAvailable){
 			if (notifications.didSucceed){
 				this.delegator.delegateIsDone("You have none recent notifications");				
@@ -33,7 +33,7 @@ public class UserGetNotifications extends SuperUser {
 		}
 		else{
 			if (notifications.didSucceed){
-				this.delegator.delegateIsDone(" ");
+				this.delegator.delegateIsDone(notifications.toString());
 			}
 			else{
 				this.delegator.delegateIsDone("There was an error creating the user with the message \"" + notifications.errorMessage + "\"");
