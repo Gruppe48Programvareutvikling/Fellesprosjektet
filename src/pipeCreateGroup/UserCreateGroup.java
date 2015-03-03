@@ -18,8 +18,6 @@ public class UserCreateGroup extends SuperUser {
 
 	public UserCreateGroup(ControllerInterface delegator) {
 		this.delegator = delegator;
-
-		System.out.println("The UserCreateGroup class was initialized. Will return immediately");
 	}
 
 	public void startRunning() {
@@ -51,11 +49,10 @@ public class UserCreateGroup extends SuperUser {
 			else if (nextInput.equals("no")){
 				ServerResult result = this.server.createGroup(this.groupConstructor);
 				if (result.didSucceed){
-					
 					this.delegator.delegateIsDone("You have successfully created a group");					
 				}
 				else{
-					this.delegator.delegateIsDone("There was an error creating the user with the message \"" + result.errorMessage + "\"");
+					this.delegator.delegateIsDone("There was an error creating the group with the message \"" + result.errorMessage + "\"");
 				}
 				break;
 			}
