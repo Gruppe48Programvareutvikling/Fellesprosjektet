@@ -1,22 +1,22 @@
 package pipeGetNotifications;
 
-<<<<<<< HEAD
+
 import dataStructures.Notification;
-=======
+
 import dataStructures.User;
->>>>>>> Martin
+
 import mainControlStructure.ControllerInterface;
 import serverReturnTypes.ServerAvailabilityResult;
 import superClasses.SuperUser;
 
 public class UserGetNotifications extends SuperUser {
 	
-<<<<<<< HEAD
+
 	private Notification notification = new Notification();
-=======
+
 	private ServerGetNotifications server = new ServerGetNotifications();
 
->>>>>>> Martin
+
 	
 	public UserGetNotifications(ControllerInterface delegator) {
 		this.delegator = delegator;
