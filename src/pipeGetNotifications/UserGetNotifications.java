@@ -2,13 +2,10 @@ package pipeGetNotifications;
 
 
 import dataStructures.Notification;
-<<<<<<< HEAD
 
 import dataStructures.User;
 
-=======
-import dataStructures.User;
->>>>>>> origin/master
+
 import mainControlStructure.ControllerInterface;
 import serverReturnTypes.ServerNotificationsResult;
 import superClasses.SuperUser;
@@ -24,7 +21,7 @@ public class UserGetNotifications extends SuperUser {
 	
 	public UserGetNotifications(ControllerInterface delegator) {
 		this.delegator = delegator;
-		System.out.println("Here is your current notifications");
+		System.out.println("Here are your current notifications:" + "\n");
 	}
 	
 	public void startRunning() {

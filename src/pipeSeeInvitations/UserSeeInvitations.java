@@ -20,17 +20,17 @@ public class UserSeeInvitations extends SuperUser {
 	}
 	
 	public void startRunning() {
-		System.out.println("Fetching from server..");
+		System.out.println("Fetching from server...");
 		System.out.println("\n");
 		 ServerInvitationsResult invitationResult = this.server.checkForInvitations(User.currentUser().username);
-		 if (invitationResult.invitations == null){ 
+		 if (invitationResult.eventids == null){ 
 			 this.state = State.NO_INVITATIONS;
 			 this.delegator.delegateIsDone("No pending invitations. Exiting to main menu...");
 		 }
 		 else{
-			 System.out.println("Invitations below:" + '\n' + invitationResult.invitations);
+			 System.out.println("Invitations below:" + '\n' + invitationResult.toString());
 			 this.state = State.SELECT_INVITATIONS;
-			 this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Select the id of the invitation you want to respond to. Type 'none' if you don't want to respond at this time");
+			 this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Select the id of the invitation you want to respond to." + "\n" + "Type 'none' if you don't want to respond at this time");
 		 }
 	}
 	

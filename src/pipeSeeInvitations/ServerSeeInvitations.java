@@ -32,22 +32,22 @@ public class ServerSeeInvitations extends ServerManager {
 			while (result.next()){
 				gotResult = true;
 		
-				theResult.invitations.add(result.getString("eventId"));
-				theResult.invitations.add(result.getString("name"));
-				theResult.invitations.add(result.getString("description"));
-				theResult.invitations.add(result.getString("startDate"));
-				theResult.invitations.add(result.getString("endDate"));
-				theResult.invitations.add( result.getString("location"));
-				theResult.invitations.add(result.getString("username"));
-				theResult.invitations.add(result.getString("status"));
+				theResult.eventids.add(result.getString("eventId"));
+				theResult.names.add(result.getString("name"));
+				theResult.descriptions.add(result.getString("description"));
+				theResult.startdates.add(result.getString("startDate"));
+				theResult.enddates.add(result.getString("endDate"));
+				theResult.locations.add( result.getString("location"));
+				theResult.usernames.add(result.getString("username"));
+				theResult.statuses.add(result.getString("status"));
 			}
 			if (gotResult == false){
-				theResult.invitations = null;
+				theResult.eventids = null;
 			}
 				}catch (SQLException e){
 					System.out.println("Got exception");
 					ServerManager.processSQLException(e);
-					theResult.invitations = null;
+					theResult.eventids = null;
 					theResult.errorMessage = e.getMessage();
 		
 				}
