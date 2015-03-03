@@ -9,6 +9,7 @@ import superClasses.ServerResult;
 
 public class ServerAvailabilityResult extends ServerResult {
 	public boolean isAvailable;
+<<<<<<< HEAD
 	
 	public List<String> name=new ArrayList<String>();
 	public List<String> description=new ArrayList<String>();
@@ -40,4 +41,9 @@ public class ServerAvailabilityResult extends ServerResult {
 		}
 		return printer;
 	}
+=======
+	public String eventname;
+	public String startdate;
+	public String enddate;
+>>>>>>> Martin
 }

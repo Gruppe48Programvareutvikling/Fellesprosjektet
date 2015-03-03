@@ -10,7 +10,6 @@ public class UserCheckRSVPStatusForEvents extends SuperUser {
 	
 	private State state = State.SET_EVENT_TO_CHECK;
 	private ServerCheckRSVPStatusForEvents server = new ServerCheckRSVPStatusForEvents();
-
 	
 	public UserCheckRSVPStatusForEvents(ControllerInterface delegator) {
 		this.delegator = delegator;
