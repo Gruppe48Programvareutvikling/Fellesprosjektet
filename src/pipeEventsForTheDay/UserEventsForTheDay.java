@@ -13,7 +13,7 @@ public class UserEventsForTheDay extends SuperUser {
 	
 	public UserEventsForTheDay(ControllerInterface delegator) {
 		this.delegator = delegator;
-		System.out.println("Here is todays event: ");
+		System.out.println("Here is todays event:\n\n");
 		
 	}
 	
