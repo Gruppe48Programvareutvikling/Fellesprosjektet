@@ -43,7 +43,7 @@ public class ServerEventsForTheDay extends ServerManager {
 				theResult.endTime.add(result.getTime("endDate"));
 
 			}
-			System.out.println(theResult.toString());
+			
 
 			if (gotResult == false){
 				theResult.isAvailable = false;
