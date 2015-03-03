@@ -29,7 +29,8 @@ public class UserEventsForTheDay extends SuperUser {
 		}
 		else{
 			if (event.didSucceed){
-				this.delegator.delegateIsDone("Events sucsessfully retreaved ");
+				
+				this.delegator.delegateIsDone(event.toString()+"\n\nEvents sucsessfully retreaved ");
 			}
 			else{
 				this.delegator.delegateIsDone("There was an error retreaving the event the message \"" + event.errorMessage + "\"");
