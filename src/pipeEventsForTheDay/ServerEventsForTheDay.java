@@ -13,7 +13,7 @@ public class ServerEventsForTheDay extends ServerManager {
 	private final String SQL_GET_EVENT = ("select name, description, startDate, endDate, location, roomNumber "+
 										  "from InvitesToEvent,Event "+
 										  "where InvitesToEvent.userName=Event.userName and InvitesToEvent.userName=? and (select distinct(date(startDate)) from Event where date(startDate)=CURDATE())");
-
+	
 	public ServerAvailabilityResult getEvent(String username){
 		ServerAvailabilityResult theResult = new ServerAvailabilityResult();
 		ResultSet result = null;
@@ -32,15 +32,18 @@ public class ServerEventsForTheDay extends ServerManager {
 				gotResult = true;
 				theResult.isAvailable = true;
 				theResult.didSucceed = true;
-				System.out.println("Name:\t\t"+result.getString("name"));
-				System.out.println("Description:\t"+result.getString("description"));
-				System.out.println("Start date:\t"+result.getDate("startDate")+" "+result.getTime("startDate"));
-				System.out.println("End date:\t"+result.getDate("endDate")+" "+result.getTime("endDate"));
-				System.out.println("Location:\t"+result.getString("location"));
-				System.out.println("Room:\t\t"+result.getString("roomNumber"));
-				System.out.println("-----------------------------------------------\n");
+				
+				theResult.name.add(result.getString("name"));
+				theResult.description.add(result.getString("description"));
+				theResult.location.add(result.getString("location"));
+				theResult.roomNumber.add(result.getString("roomNumber"));
+				theResult.startDate.add(result.getDate("startDate"));
+				theResult.endDate.add(result.getDate("endDate"));
+				theResult.startTime.add(result.getTime("startDate"));
+				theResult.endTime.add(result.getTime("endDate"));
 
 			}
+			System.out.println(theResult.toString());
 
 			if (gotResult == false){
 				theResult.isAvailable = false;
