@@ -2,12 +2,14 @@ package dataStructures;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Event {
 	
+	private ArrayList<User> participants;
+	private ArrayList<Group> groups;
 	public String name;
 	public String description;
+<<<<<<< HEAD
 	public Date startDate = new Date();
 	public Date	endDate = new Date();
 	public Room room; //
@@ -17,5 +19,12 @@ public class Event {
 	public double delayedAmount; //
 	public String location;
 	public String private
+=======
+	public Date date;
+	public Double duration;
+	public Room room;
+	public String eventId;
+	
+>>>>>>> origin/master
 
 }

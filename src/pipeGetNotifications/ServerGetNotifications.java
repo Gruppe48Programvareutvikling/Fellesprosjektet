@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import serverReturnTypes.ServerAvailabilityResult;
+import serverReturnTypes.ServerNotificationsResult;
 import superClasses.ServerManager;
 
 public class ServerGetNotifications extends ServerManager {
@@ -13,8 +13,8 @@ public class ServerGetNotifications extends ServerManager {
 	private final String SQL_GET_NOTIFICATIONS = "SELECT date, message FROM Notification WHERE userName=? order by notificationId desc Limit 10";
 
 	
-	public ServerAvailabilityResult getNotifications(String username){
-		ServerAvailabilityResult theResult = new ServerAvailabilityResult();
+	public ServerNotificationsResult getNotifications(String username){
+		ServerNotificationsResult theResult = new ServerNotificationsResult();
 		ResultSet result = null;
 
 		try(
@@ -31,11 +31,9 @@ public class ServerGetNotifications extends ServerManager {
 				gotResult = true;
 				theResult.isAvailable = true;
 				theResult.didSucceed = true;
-				System.out.print(result.getDate("date"));
-				System.out.print(" ");
-				System.out.print(result.getTime("date"));
-				System.out.print("  ");
-				System.out.println(result.getString("message"));
+				theResult.date.add(result.getDate("date").toString());
+				theResult.time.add(result.getTime("date").toString());
+				theResult.message.add(result.getString("message"));
 			}
 
 			if (gotResult == false){

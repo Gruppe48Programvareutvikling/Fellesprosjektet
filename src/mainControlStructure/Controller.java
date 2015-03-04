@@ -19,20 +19,20 @@ import pipeSeeInvitations.UserSeeInvitations;
 public class Controller implements ControllerInterface {
 	
 	// All of these should be in lowercase
-	private static final String COMMAND_CREATE_USER 						= "create user";
-	private static final String COMMAND_CHECK_AVAILABILITY 					= "check availability";
-	private static final String COMMAND_CREATE_EVENT						= "create event";
-	private static final String COMMAND_SEE_INVITATIONS						= "see invitations";
-	private static final String COMMAND_LOGIN								= "login";
-	private static final String COMMAND_CREATE_GROUP						= "create group";
-	private static final String COMMAND_EDIT_EVENT							= "edit event";
-	private static final String COMMAND_CHECK_RSVP_STATUS_FOR_EVENTS		= "check rsvp status for events";
-	private static final String COMMAND_EVENTS_FOR_THE_DAY					= "events for the day";
-	private static final String COMMAND_GET_NOTIFICATIONS					= "see notifications";
-	private static final String COMMAND_RESPOND_TO_DISTRIBUTED_INVITATIONS  = "respond to distributed invitations";
+	public static final String COMMAND_CREATE_USER 						= "create user";
+	public static final String COMMAND_CHECK_AVAILABILITY 					= "check availability";
+	public static final String COMMAND_CREATE_EVENT						= "create event";
+	public static final String COMMAND_SEE_INVITATIONS						= "see invitations";
+	public static final String COMMAND_LOGIN								= "login";
+	public static final String COMMAND_CREATE_GROUP						= "create group";
+	public static final String COMMAND_EDIT_EVENT							= "edit event";
+	public static final String COMMAND_CHECK_RSVP_STATUS_FOR_EVENTS		= "check rsvp status for events";
+	public static final String COMMAND_EVENTS_FOR_THE_DAY					= "events for the day";
+	public static final String COMMAND_GET_NOTIFICATIONS					= "see notifications";
+	public static final String COMMAND_RESPOND_TO_DISTRIBUTED_INVITATIONS  = "respond to distributed invitations";
 	
-	private static final String COMMAND_LOGOUT								= "logout";
-	private static final String COMMAND_HELP								= "help";
+	public static final String COMMAND_LOGOUT								= "logout";
+	public static final String COMMAND_HELP								= "help";
 	
 	
 	
