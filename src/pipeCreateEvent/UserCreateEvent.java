@@ -197,8 +197,7 @@ public class UserCreateEvent extends SuperUser {
 								this.eventConstructor.endDate.setMinutes(min);
 								this.state = State.ENTER_LOCATION;
 								
-								ServerFindGroupResult result = this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username);
-								System.out.println(result.groupName); //printe ut, har ikke laget toString
+								
 								this.delegator.delegateIsReadyForNextInputWithPrompt("Write the location of your event");
 							}
 							else{
@@ -213,7 +212,11 @@ public class UserCreateEvent extends SuperUser {
 			if (nextInput.length()<=45){
 				this.eventConstructor.location = nextInput;
 				this.state = State.ENTER_GROUP_NAME;
+				ServerFindGroupResult result = this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username);
+				System.out.println(result.groupName); //printe ut, har ikke laget toString
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
+				
+				
 			}else {
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of your location was too long, please try again");
 			}
@@ -224,6 +227,8 @@ public class UserCreateEvent extends SuperUser {
 					if(this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username).groupName.contains(nextInput)){
 						ServerFindGroupResult result = this.server.getGroupUsers(nextInput);
 						addGroupUsers(result.groupUsers);
+						ServerGetCalendarsResult result2 = this.server.getGroupCalendarName(nextInput);
+						this.eventConstructor.groupCalendarName = result2.calendarnames;
 					}
 					
 					this.state = State.ENTER_Participants;
@@ -239,7 +244,7 @@ public class UserCreateEvent extends SuperUser {
 					//skjekk med server
 					ServerFindUserResult result = this.server.findUser(nextInput);
 					if (result.userExists == true){
-						if (!(existsInList(this.eventConstructor.group, nextInput) || existsInList(this.eventConstructor.participants, nextInput))){ //skjekk om bruker allerede er i lista
+						if (!(existsInList(this.eventConstructor.participants, nextInput))){ //skjekk om bruker allerede er i lista
 					
 							this.eventConstructor.participants.add(new User(nextInput));
 							this.state = State.ADD_MORE;
@@ -336,7 +341,7 @@ public class UserCreateEvent extends SuperUser {
 	}
 	public void addGroupUsers(Collection<String> groupUsers){
 		for(String elem: groupUsers){
-			this.eventConstructor.group.add(new User(elem));
+			this.eventConstructor.participants.add(new User(elem));
 			
 		}
 	}

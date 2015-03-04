@@ -18,10 +18,10 @@ import superClasses.ServerResult;
 public class ServerCreateEvent extends ServerManager {
 	private final String SQL_FIND_USER = "Select userName from User where userName =?";
 	private final String SQL_FIND_GROUPS_FROM_USERNAME = "Select groupName from GroupUsers where userName =?";
-	private final String SQL_FIND_GROUP_CALENDAR = "Select userName from GroupUsers where groupName=? and userName !=?";
+	private final String SQL_FIND_GROUP_USERS_FROM_GROUP = "Select userName from GroupUsers where groupName=? and userName !=?";
 	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber FROM Room r1, Event e1 WHERE r1.numberOfSeats > ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = r1.roomNumber AND (? <= e2.startDate AND e? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate) )";
 	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, groupName, descriptions, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?,?,?)";
-	
+	private final String SQL_FIND_GROUP_CALENDAR_NAME = "SELECT groupCalendarName FROM GroupCalendar WHERE groupName =?";
 	public ServerFindGroupResult getListOfGroupsTheUserIsPartOf(String userName){
 		ServerFindGroupResult theResult = new ServerFindGroupResult();
 		ResultSet result = null;
@@ -61,7 +61,7 @@ public class ServerCreateEvent extends ServerManager {
 		ResultSet result = null;
 		try(
 				Connection connection = this.getDataBaseConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_FIND_GROUP_CALENDAR, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
+				PreparedStatement statement = connection.prepareStatement(SQL_FIND_GROUP_USERS_FROM_GROUP, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
 				){
 					
 					statement.setString(1, groupName);
@@ -130,6 +130,33 @@ public class ServerCreateEvent extends ServerManager {
 				statement.setString(2, Event.this.startDate.g);
 					
 				}
+		return null;
+	}
+	public ServerGetCalendarsResult getGroupCalendarName(String groupName){
+		ServerGetCalendarsResult theResult = new ServerGetCalendarsResult();
+		ResultSet result = null;
+		try(
+				Connection connection = this.getDataBaseConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_CREATE_EVENT, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
+			){
+			statement.setString(1, groupName);
+			result = statement.executeQuery();
+			boolean gotResult = false;
+			while(result.next()){
+				gotResult = true;
+				theResult.calendarnames = result.getString(1);
+				theResult.didSucceed = true;
+			}
+			if(gotResult == false){
+				theResult.didSucceed = true;
+				
+				System.out.println("Group has no group calendar");
+			}
+		}catch (SQLException e) {
+			theResult.didSucceed = false;
+			System.out.println("sql error");
+		}
+			
 		return null;
 	}
 	public ServerResult createEvent(Event eventToCreate){

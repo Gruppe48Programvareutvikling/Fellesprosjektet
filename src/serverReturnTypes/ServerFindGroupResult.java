@@ -6,8 +6,9 @@ import java.util.Collection;
 import superClasses.ServerResult;
 
 public class ServerFindGroupResult extends ServerResult {
-	public Collection<String> groupName = new ArrayList<String>();
+	public Collection<String> groupNames = new ArrayList<String>();
 	public Collection<String> groupUsers = new ArrayList<String>();
+	public String groupName;
 	
 	public void addGroupName(String groupName){
 		this.groupName.add(groupName);
