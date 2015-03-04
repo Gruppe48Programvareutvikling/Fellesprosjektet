@@ -9,8 +9,8 @@ import superClasses.SuperUser;
 
 public class UserRespondToDistributedInvitations extends SuperUser {
 	
-	private enum State {SELECT_USER, FETCH_INVITATIONS, SELECT_INVITATIONS, RESPONDTO_INVITATIONS, NO_INVITATIONS}
-	private State state = State.SELECT_USER;
+	private enum State {FETCH_INVITATIONS, SELECT_INVITATIONS, RESPONDTO_INVITATIONS, NO_INVITATIONS}
+	private State state = State.FETCH_INVITATIONS;
 	private ServerRespondToDistributedInvitations server = new ServerRespondToDistributedInvitations();
 	private String selectedUsername;
 	private int selectedInvitation;
@@ -23,7 +23,7 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 	}
 	
 	public void startRunning() {
-		this.delegator.delegateIsReadyForNextInputWithPrompt("Please enter the username who's invitations you want to respond to:");
+		this.delegator.delegateIsReadyForNextInputWithPrompt("Please enter the username who's invitations you want to respond to");
 		
 	}
 	
@@ -36,7 +36,7 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 			 ServerInvitationsResult invitationResult = this.server.checkForInvitations(User.currentUser().username, selectedUsername);
 			 if (invitationResult.eventids == null){ 
 				 this.state = State.NO_INVITATIONS;
-				 this.delegator.delegateIsDone("No pending invitations. Exiting to main menu...");
+				 this.delegator.delegateIsDone("No pending invitations for this username. Exiting to main menu...");
 			 }
 			 else{
 				 System.out.println("Invitations below:" + '\n' + invitationResult.toString());

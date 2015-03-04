@@ -10,7 +10,7 @@ import superClasses.ServerManager;
 
 public class ServerRespondToDistributedInvitations extends ServerManager {
 	
-	private final String SQL_GET_INVITATIONS = "select * from Event join InvitesToEvent on Event.eventId = InvitesToEvent.eventId where InvitesToEvent.userName = ?";
+	private final String SQL_GET_INVITATIONS = "select * from Event join InvitesToEvent on Event.eventId = InvitesToEvent.eventId where InvitesToEvent.userName = ? and Event.userName = ?";
 	private final String SQL_RESPONDTO_INVITATIONS = "update InvitesToEvent set status = ? where username = ? and eventId = ?";
 			
 
@@ -23,8 +23,8 @@ public class ServerRespondToDistributedInvitations extends ServerManager {
 				PreparedStatement statement = connection.prepareStatement(SQL_GET_INVITATIONS, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 				)
 				{
-			statement.setString(1, username);
-			statement.setString(2, selectedUsername);
+			statement.setString(1, selectedUsername);
+			statement.setString(2, username);
 			result = statement.executeQuery();
 			
 			
@@ -55,17 +55,16 @@ public class ServerRespondToDistributedInvitations extends ServerManager {
 		return theResult;
 	}
 	
-	public ServerInvitationsResult respontoInvitation(int eventId, String response, String username){
+	public ServerInvitationsResult respontoInvitation(int eventId, String response, String selectedUsername){
 		ServerInvitationsResult theResult = new ServerInvitationsResult();
 		
-		ResultSet result = null;
 		try (
 				Connection connection = this.getDataBaseConnection();
 				PreparedStatement statement = connection.prepareStatement(SQL_RESPONDTO_INVITATIONS);
 				)
 				{
 			statement.setString(1, response);
-			statement.setString(2, username);
+			statement.setString(2, selectedUsername);
 			statement.setInt(3, eventId);
 			int affected = statement.executeUpdate();
 			
