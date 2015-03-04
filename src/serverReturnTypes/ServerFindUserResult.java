@@ -1,5 +1,7 @@
 package serverReturnTypes;
 
+import java.util.Collections;
+
 import superClasses.ServerResult;
 
 public class ServerFindUserResult extends ServerResult {

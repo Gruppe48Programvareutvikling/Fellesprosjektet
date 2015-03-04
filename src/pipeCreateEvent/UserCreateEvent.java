@@ -1,16 +1,21 @@
 package pipeCreateEvent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.hamcrest.core.SubstringMatcher;
+import org.mockito.cglib.transform.impl.AddDelegateTransformer;
 
 import javafx.scene.web.PromptData;
 import dataStructures.Event;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
+import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
 import serverReturnTypes.ServerRoomResult;
@@ -18,8 +23,8 @@ import superClasses.ServerResult;
 import superClasses.SuperUser;
 
 public class UserCreateEvent extends SuperUser {
-	private enum State{ENTER_NAME, ENTER_DESCRIPTION, ENTER_STARTDATE, ENTER_ENDDATE, ENTER_SCLOCK, ENTER_ECLOCK, ENTER_CALENDAR,
-		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_ROOM_NUMBER}
+	private enum State{ENTER_NAME, ENTER_DESCRIPTION, ENTER_STARTDATE, ENTER_ENDDATE, ENTER_SCLOCK, ENTER_ECLOCK, ENTER_GROUP_NAME,
+		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_ROOM_NUMBER, ADD_TO_DATABASE}
 	State state = State.ENTER_NAME;
 	private Event eventConstructor = new Event();
 	private ServerCreateEvent server = new ServerCreateEvent();
@@ -117,7 +122,7 @@ public class UserCreateEvent extends SuperUser {
 					
 							
 						}
-					}catch(NumberFormatException e){
+					}catch(Exception e){
 						this.delegator.delegateIsReadyForNextInputWithPrompt("Please write it as hh.mm");
 					}	
 			break;
@@ -146,10 +151,10 @@ public class UserCreateEvent extends SuperUser {
 				test.setDate(day);
 				test.setMonth(month);
 				test.setYear(year);
-					if(test.after(this.eventConstructor.startDate)){
-						if (year>0){
-							this.eventConstructor.endDate.setYear(year-1900);
-						}
+					if(compareDates(this.eventConstructor.startDate, test) >= 0){
+						
+						this.eventConstructor.endDate.setYear(year-1900);
+						
 						if (month >=1 && month <=12){
 							this.eventConstructor.endDate.setMonth(month);
 						
@@ -158,15 +163,18 @@ public class UserCreateEvent extends SuperUser {
 							if (day <= daysInMonth && day >0 ){
 								this.eventConstructor.endDate.setDate(day);
 								this.state = State.ENTER_ECLOCK;
-								this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the time of the day hh.mm");
+								this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the endtime of the day hh.mm");
 					
 						
 							}
 						}
-						else{this.delegator.delegateIsReadyForNextInputWithPrompt("Date does not exist");
+						else{
+							this.delegator.delegateIsReadyForNextInputWithPrompt("Date does not exist");
 						
 						}
-					}	
+					}else{
+						this.delegator.delegateIsReadyForNextInputWithPrompt("Date is before startdate");
+					}
 				}catch (NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Please use numbers");
 					
@@ -183,15 +191,15 @@ public class UserCreateEvent extends SuperUser {
 							Date test = this.eventConstructor.endDate;
 							test.setHours(hour);
 							test.setMinutes(min);
-							if (test.after(this.eventConstructor.startDate)){
+							if (compareDates(test,this.eventConstructor.startDate)==0 && isTimeAfter(test, this.eventConstructor.startDate)){
 							
 								this.eventConstructor.endDate.setHours(hour);
 								this.eventConstructor.endDate.setMinutes(min);
-								this.state = State.ENTER_CALENDAR;
+								this.state = State.ENTER_LOCATION;
 								
-								ServerGetCalendarsResult result = this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username);
-								System.out.println(result.calendarnames); //printe ut
-								this.delegator.delegateIsReadyForNextInputWithPrompt("Choose the calendar you want to put the event in");
+								ServerFindGroupResult result = this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username);
+								System.out.println(result.groupName); //printe ut, har ikke laget toString
+								this.delegator.delegateIsReadyForNextInputWithPrompt("Write the location of your event");
 							}
 							else{
 								this.delegator.delegateIsReadyForNextInputWithPrompt("Time is before the starttime");
@@ -200,35 +208,45 @@ public class UserCreateEvent extends SuperUser {
 					}catch(NumberFormatException e){
 							this.delegator.delegateIsReadyForNextInputWithPrompt("Please use numbers hh.mm");
 					}
-							
-		case ENTER_CALENDAR:
-			if (nextInput.length()<=45){
-				//Har valgt kalender
-				this.state = State.ENTER_LOCATION;
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Write the location of you event");
-			}else{
-				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of the calendar was too long, try again");
-			}
-			
-			break;
+							break;
 		case ENTER_LOCATION:
 			if (nextInput.length()<=45){
 				this.eventConstructor.location = nextInput;
-				this.state = State.ENTER_Participants;
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of the participant");
+				this.state = State.ENTER_GROUP_NAME;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
 			}else {
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of your location was too long, please try again");
 			}
+			break;
+		case ENTER_GROUP_NAME:
+			if (nextInput.length()<=45){
+				if(nextInput != null){
+					if(this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username).groupName.contains(nextInput)){
+						ServerFindGroupResult result = this.server.getGroupUsers(nextInput);
+						addGroupUsers(result.groupUsers);
+					}
+					
+					this.state = State.ENTER_Participants;
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of additional the participant");
+				}
+			}else{
+				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of the group was too long, try again");
+			}
+			
 			break;
 		case ENTER_Participants:
 			if (nextInput.length() <= 45){
 					//skjekk med server
 					ServerFindUserResult result = this.server.findUser(nextInput);
 					if (result.userExists == true){
-						this.eventConstructor.participants.add(new User(nextInput));
-						this.state = State.ADD_MORE;
-						this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants Y/N?");
+						if (!(existsInList(this.eventConstructor.group, nextInput) || existsInList(this.eventConstructor.participants, nextInput))){ //skjekk om bruker allerede er i lista
 					
+							this.eventConstructor.participants.add(new User(nextInput));
+							this.state = State.ADD_MORE;
+							this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants Y/N?");
+						}
+						this.state = state.ADD_MORE;
+						this.delegator.delegateIsReadyForNextInputWithPrompt("This user is already invited, want to try again? Y/N");
 					}else{
 						this.state = State.ADD_MORE;
 						this.delegator.delegateIsReadyForNextInputWithPrompt("This user does not exist, want to try again Y/N?");
@@ -241,11 +259,11 @@ public class UserCreateEvent extends SuperUser {
 			}
 			break;
 		case ADD_MORE:
-			if (nextInput == "Y" || nextInput == "y"){
+			if (nextInput.equals("Y") || nextInput.equals("y")){
 				this.state = State.ENTER_Participants;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of the participant");
 			}
-			if (nextInput == "N" || nextInput == "n"){
+			if (nextInput.equals("N") || nextInput.equals("n")){
 				this.state = State.ENTER_ROOM_NUMBER;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the number of desired seats");
 			}else{
@@ -255,16 +273,78 @@ public class UserCreateEvent extends SuperUser {
 		case ENTER_ROOM_NUMBER:
 			if (nextInput.length() <= 11)
 				try{
-					int numberOfSeats = Integer.parseInt(nextInput);
+					ServerRoomResult result = this.server.findRoomResult();
+					if (result.roomIsAvailable){
+						
+						this.eventConstructor.room.roomNumber = result.roomnumber;
+						this.eventConstructor.room.numberOfSeats = Integer.parseInt(nextInput);
+						ServerResult theResult = this.server.createEvent();
+					}
+					//int numberOfSeats = Integer.parseInt(nextInput);
 //					ServerRoomResult result = this.server			//TIME + Duration
 				}catch (NumberFormatException e){
-					
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Must write a number");
 				}
 			
 		}
 		
 	}
-	
+	public boolean isParticipantInvited(String string){
+		return false;
+	}
+	public int compareDates(Date date1, Date date2){
+		int year1 = date1.getYear()+1900;
+		int month1 = date1.getMonth();
+		int day1 = date1.getDate();
+		int year2 = date2.getYear();
+		int month2 = date2.getMonth();
+		int day2 = date2.getDate();
+		if(year1>year2){
+			return 1;
+		}
+		if (year1==year2){
+			if( year1 == year2 && month1 < month2){
+				if (year1 == year2 && month1 == month2 && day1<day2){
+				
+				
+					if(year1 == year2 && month1 == month2 && day1 == day2){
+						return 0;
+					}
+				return 1;
+				
+				}
+			return 1;
+			}
+		return 0;
+		}
+		return -1;
+	}
+	public boolean isTimeAfter(Date date1, Date date2){
+		if(date1.getHours()>date2.getHours()){
+			return true;
+		}
+		if(date1.getHours() == date2.getHours()){
+			if (date1.getMinutes()> date2.getMinutes()){
+				return true;
+			}
+			
+		}
+		return false;
+	}
+	public void addGroupUsers(Collection<String> groupUsers){
+		for(String elem: groupUsers){
+			this.eventConstructor.group.add(new User(elem));
+			
+		}
+	}
+	public boolean existsInList(List<User> list, String userName){
+		for (int i = 0; i < list.size(); i++) {
+			if(list.get(i).username.equals(userName)){
+				return true;
+			}
+		}
+		return false;
+	}
 	public void userAsksForHelp() {
 		
 	}

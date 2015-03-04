@@ -10,11 +10,11 @@ public class Event {
 	public String description;
 	public Date startDate = new Date();
 	public Date	endDate = new Date();
-	public Room room;
-	public String eventId;
+	public Room room; //
+	public String eventId; //
 	public List<User> participants = new ArrayList<User>();
-	public List<User> group = new ArrayList<User>();
-	public double delayedAmount;
+	public List<User> group = new ArrayList<User>();  //Skal det være user?
+	public double delayedAmount; //
 	public String location;
 
 }
