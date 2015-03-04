@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import dataStructures.Event;
+import dataStructures.Invitation;
 import dataStructures.User;
 import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
@@ -29,7 +30,6 @@ public class ServerCreateEvent extends ServerManager {
 				PreparedStatement statement = connection.prepareStatement(SQL_FIND_GROUPS_FROM_USERNAME, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 				){
 			statement.setString(1, userName);
-			
 			result = statement.executeQuery();
 			
 			boolean gotResult = false;
@@ -148,10 +148,25 @@ public class ServerCreateEvent extends ServerManager {
 			statement.setString(8, eventToCreate.location);
 			statement.setString(9, User.currentUser().username);
 			statement.setInt(10, eventToCreate.room.roomNumber);
+			int affected = statement.executeUpdate();
+			
+			if (affected == 1){
+				result.didSucceed = true;
+					
+			}
+			else{
+				result.didSucceed = false;
+				result.errorMessage = "Uknow Error while creating event";
+			}
 			
 		}catch (SQLException e) {
-			// TODO: handle exception
+			result.didSucceed = false;
+			result.errorMessage = e.getMessage();
 		}
-			return null;
+			return result;
+	}
+	public ServerResult createInvitations(Invitation invitationToCreate){
+		
+		return null;
 	}
 }

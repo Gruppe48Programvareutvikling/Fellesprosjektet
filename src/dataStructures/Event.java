@@ -16,5 +16,6 @@ public class Event {
 	public List<User> group = new ArrayList<User>();  //Skal det være user?
 	public double delayedAmount; //
 	public String location;
+	public String private
 
 }

@@ -273,12 +273,13 @@ public class UserCreateEvent extends SuperUser {
 		case ENTER_ROOM_NUMBER:
 			if (nextInput.length() <= 11)
 				try{
-					ServerRoomResult result = this.server.findRoomResult();
+					ServerRoomResult result = this.server.findRoomResult(nextInput);
 					if (result.roomIsAvailable){
 						
 						this.eventConstructor.room.roomNumber = result.roomnumber;
 						this.eventConstructor.room.numberOfSeats = Integer.parseInt(nextInput);
-						ServerResult theResult = this.server.createEvent();
+						ServerResult theResult = this.server.createEvent(this.eventConstructor);
+						this.delegator.delegateIsDone("Event created");
 					}
 					//int numberOfSeats = Integer.parseInt(nextInput);
 //					ServerRoomResult result = this.server			//TIME + Duration
@@ -289,6 +290,8 @@ public class UserCreateEvent extends SuperUser {
 		}
 		
 	}
+	
+	
 	public boolean isParticipantInvited(String string){
 		return false;
 	}
