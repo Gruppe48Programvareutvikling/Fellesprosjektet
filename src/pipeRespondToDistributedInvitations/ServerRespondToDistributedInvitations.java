@@ -14,7 +14,7 @@ public class ServerRespondToDistributedInvitations extends ServerManager {
 	private final String SQL_RESPONDTO_INVITATIONS = "update InvitesToEvent set status = ? where username = ? and eventId = ?";
 			
 
-	public ServerInvitationsResult checkForInvitations(String username) {
+	public ServerInvitationsResult checkForInvitations(String username, String selectedUsername) {
 		ServerInvitationsResult theResult = new ServerInvitationsResult(); 
 		
 		ResultSet result = null;
@@ -24,6 +24,7 @@ public class ServerRespondToDistributedInvitations extends ServerManager {
 				)
 				{
 			statement.setString(1, username);
+			statement.setString(2, selectedUsername);
 			result = statement.executeQuery();
 			
 			

@@ -9,9 +9,10 @@ import superClasses.SuperUser;
 
 public class UserRespondToDistributedInvitations extends SuperUser {
 	
-	private enum State {SELECT_INVITATIONS, RESPONDTO_INVITATIONS, NO_INVITATIONS}
-	private State state = State.SELECT_INVITATIONS;
+	private enum State {SELECT_USER, FETCH_INVITATIONS, SELECT_INVITATIONS, RESPONDTO_INVITATIONS, NO_INVITATIONS}
+	private State state = State.SELECT_USER;
 	private ServerRespondToDistributedInvitations server = new ServerRespondToDistributedInvitations();
+	private String selectedUsername;
 	private int selectedInvitation;
 	private String invitationReply;
 	
@@ -22,23 +23,26 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 	}
 	
 	public void startRunning() {
-		System.out.println("Fetching from server...");
-		System.out.println("\n");
-		 ServerInvitationsResult invitationResult = this.server.checkForInvitations(User.currentUser().username);
-		 if (invitationResult.eventids == null){ 
-			 this.state = State.NO_INVITATIONS;
-			 this.delegator.delegateIsDone("No pending invitations. Exiting to main menu...");
-		 }
-		 else{
-			 System.out.println("Invitations below:" + '\n' + invitationResult.toString());
-			 this.state = State.SELECT_INVITATIONS;
-			 this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Select the id of the invitation you want to respond to." + "\n" + "Type 'none' if you don't want to respond at this time");
-		 }
+		this.delegator.delegateIsReadyForNextInputWithPrompt("Please enter the username who's invitations you want to respond to:");
 		
 	}
 	
 	public void sendNextInput(String nextInput) {
 		switch (this.state) {
+		case FETCH_INVITATIONS:
+			this.selectedUsername = nextInput;
+			System.out.println("Fetching from server...");
+			System.out.println("\n");
+			 ServerInvitationsResult invitationResult = this.server.checkForInvitations(User.currentUser().username, selectedUsername);
+			 if (invitationResult.eventids == null){ 
+				 this.state = State.NO_INVITATIONS;
+				 this.delegator.delegateIsDone("No pending invitations. Exiting to main menu...");
+			 }
+			 else{
+				 System.out.println("Invitations below:" + '\n' + invitationResult.toString());
+				 this.state = State.SELECT_INVITATIONS;
+				 this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Select the id of the invitation you want to respond to." + "\n" + "Type 'none' if you don't want to respond at this time");
+			 }
 		case SELECT_INVITATIONS:
 			if (nextInput.equals("none")){
 				this.state = State.NO_INVITATIONS;
