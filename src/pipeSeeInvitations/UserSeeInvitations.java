@@ -13,10 +13,6 @@ public class UserSeeInvitations extends SuperUser {
 	private int selectedInvitation;
 	private String invitationReply;
 	public UserSeeInvitations(ControllerInterface delegator) {
-		this.delegator = delegator;
-		
-		//System.out.println("The UserSeeInvitations class was initialized. Will return immediately");
-		//this.delegator.delegateIsDone("UserSeeInvitations is done");
 	}
 	
 	public void startRunning() {
