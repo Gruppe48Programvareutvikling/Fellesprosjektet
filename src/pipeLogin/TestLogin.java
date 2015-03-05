@@ -73,7 +73,7 @@ public class TestLogin {
 		assertEquals("delegateIsReady... received wrong string after asking for help after entering username",
 				UserLogin.HELP_PASSWORD,   	   readyForNextInputArguments.get(3));
 		
-		String _2attemptsLeftRegex = UserLogin.ERROR_WRONG_PW_PART_ONE + " 2 " +  UserLogin.ERROR_WRONG_PW_PART_TWO;
+		String _2attemptsLeftRegex = UserLogin.ERROR_WRONG_PW_PART_ONE + "2" +  UserLogin.ERROR_WRONG_PW_PART_TWO;
 		assertEquals("delegateIsReady... received wrong string after entering first wrong password. 2 retries left", 
 				_2attemptsLeftRegex, readyForNextInputArguments.get(4));
 
@@ -86,7 +86,7 @@ public class TestLogin {
 		assertEquals("delegateIsReady... received wrong string after asking for help after entering username",
 				UserLogin.HELP_PASSWORD,   	   readyForNextInputArguments.get(7));
 		
-		String _1attemptLeftRegex = UserLogin.ERROR_WRONG_PW_PART_ONE + " 1 " +  UserLogin.ERROR_WRONG_PW_PART_TWO;
+		String _1attemptLeftRegex = UserLogin.ERROR_WRONG_PW_PART_ONE + "1" +  UserLogin.ERROR_WRONG_PW_PART_TWO;
 		assertEquals("delegateIsReady... received wrong string after entering second wrong password. 1 retry left", 
 				_1attemptLeftRegex, readyForNextInputArguments.get(8));
 
