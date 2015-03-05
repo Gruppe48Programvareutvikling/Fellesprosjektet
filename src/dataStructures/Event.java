@@ -16,8 +16,12 @@ public class Event {
 	public List<Group> group = new ArrayList<Group>();  //Skal det være user?
 	public double delayedAmount; //
 	public String location;
-	public String privateCalendarName;
-	public String groupCalendarName;
+	public List<String> calendarNames = new ArrayList<String>();
+	public String groupCalendarName; //gjøres til list
+	
+	public String getDate(Date date){
+		return null;
+	}
 	
 
 }

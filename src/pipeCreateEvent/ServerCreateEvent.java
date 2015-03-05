@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 import dataStructures.Event;
 import dataStructures.Invitation;
@@ -19,9 +20,10 @@ public class ServerCreateEvent extends ServerManager {
 	private final String SQL_FIND_USER = "Select userName from User where userName =?";
 	private final String SQL_FIND_GROUPS_FROM_USERNAME = "Select groupName from GroupUsers where userName =?";
 	private final String SQL_FIND_GROUP_USERS_FROM_GROUP = "Select userName from GroupUsers where groupName=? and userName !=?";
-	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber FROM Room r1, Event e1 WHERE r1.numberOfSeats > ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = r1.roomNumber AND (? <= e2.startDate AND e? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate) )";
+	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber FROM Room r1, Event e1 WHERE r1.numberOfSeats > ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND (? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate) )";
 	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, groupName, descriptions, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?,?,?)";
 	private final String SQL_FIND_GROUP_CALENDAR_NAME = "SELECT groupCalendarName FROM GroupCalendar WHERE groupName =?";
+	
 	public ServerFindGroupResult getListOfGroupsTheUserIsPartOf(String userName){
 		ServerFindGroupResult theResult = new ServerFindGroupResult();
 		ResultSet result = null;
@@ -119,7 +121,7 @@ public class ServerCreateEvent extends ServerManager {
 		return theResult;
 	}
 	
-	public ServerRoomResult findRoomResult(String numberOfSeats){
+	public ServerRoomResult findRoomResult(String numberOfSeats, Date startDate, Date endDate){
 		ServerRoomResult theResult = new ServerRoomResult();
 		ResultSet result = null;
 		try(
@@ -127,10 +129,31 @@ public class ServerCreateEvent extends ServerManager {
 				PreparedStatement statement = connection.prepareStatement(SQL_FIND_ROOM, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
 			){
 				statement.setString(1,numberOfSeats);
-				statement.setString(2, Event.this.startDate.g);
-					
+				statement.setString(2, dateToString(startDate));
+				statement.setString(3, dateToString(endDate));
+				statement.setString(4, dateToString(startDate));
+				statement.setString(5, dateToString(endDate));
+				result = statement.executeQuery();
+				
+				boolean gotResult = false;
+				
+				while(result.next()){
+					gotResult = true;
+					theResult.roomNumber.add(result.getInt(1));
+					theResult.roomIsAvailable = true;
+					theResult.didSucceed = true;
 				}
-		return null;
+				if (gotResult == false){
+					theResult.roomIsAvailable = false;
+					theResult.didSucceed = true;
+				}
+			}catch (SQLException e) {
+				
+				theResult.roomIsAvailable = false;
+				theResult.didSucceed = false;
+				theResult.errorMessage = e.getMessage();
+			}
+		return theResult;
 	}
 	public ServerGetCalendarsResult getGroupCalendarName(String groupName){
 		ServerGetCalendarsResult theResult = new ServerGetCalendarsResult();
@@ -168,8 +191,8 @@ public class ServerCreateEvent extends ServerManager {
 			statement.setString(1, eventToCreate.name );
 			//statement.setString(2, eventToCreate.groupName);
 			statement.setString(3, eventToCreate.description);
-			statement.setDate(4, eventToCreate.startDate);
-			statement.setDate(5, eventToCreate.endDate);
+			statement.setString(4, dateToString(eventToCreate.startDate));
+			statement.setString(5, dateToString(eventToCreate.endDate));
 			//statement.setString(6, eventToCreate.privateCalendarName);
 			//statment.setString(7, eventToCreate.groupCalendarName);
 			statement.setString(8, eventToCreate.location);
@@ -195,5 +218,13 @@ public class ServerCreateEvent extends ServerManager {
 	public ServerResult createInvitations(Invitation invitationToCreate){
 		
 		return null;
+	}
+	
+	public String dateToString(Date date){
+		String string = Integer.toString(date.getYear()) + "-"	+ Integer.toString(date.getMonth()) + "-" + Integer.toString(date.getDate()) + " " + 
+				Integer.toString(date.getHours()) + ":" + Integer.toString(date.getMinutes());
+		
+		
+		return string;
 	}
 }

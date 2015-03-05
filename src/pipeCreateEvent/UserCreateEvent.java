@@ -8,8 +8,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.hamcrest.core.SubstringMatcher;
-import org.mockito.cglib.transform.impl.AddDelegateTransformer;
+
 
 import javafx.scene.web.PromptData;
 import dataStructures.Event;
@@ -24,7 +23,8 @@ import superClasses.SuperUser;
 
 public class UserCreateEvent extends SuperUser {
 	private enum State{ENTER_NAME, ENTER_DESCRIPTION, ENTER_STARTDATE, ENTER_ENDDATE, ENTER_SCLOCK, ENTER_ECLOCK, ENTER_GROUP_NAME,
-		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_ROOM_NUMBER, ADD_TO_DATABASE}
+		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_NUMBER_OF_SEATS, 
+		ENTER_ROOM_NUMBER, ADD_TO_DATABASE}
 	State state = State.ENTER_NAME;
 	private Event eventConstructor = new Event();
 	private ServerCreateEvent server = new ServerCreateEvent();
@@ -122,7 +122,7 @@ public class UserCreateEvent extends SuperUser {
 					
 							
 						}
-					}catch(Exception e){
+					}catch(NumberFormatException e){
 						this.delegator.delegateIsReadyForNextInputWithPrompt("Please write it as hh.mm");
 					}	
 			break;
@@ -164,8 +164,6 @@ public class UserCreateEvent extends SuperUser {
 								this.eventConstructor.endDate.setDate(day);
 								this.state = State.ENTER_ECLOCK;
 								this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the endtime of the day hh.mm");
-					
-						
 							}
 						}
 						else{
@@ -213,7 +211,7 @@ public class UserCreateEvent extends SuperUser {
 				this.eventConstructor.location = nextInput;
 				this.state = State.ENTER_GROUP_NAME;
 				ServerFindGroupResult result = this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username);
-				System.out.println(result.groupName); //printe ut, har ikke laget toString
+				System.out.println(result.groupNames); //printe ut, har ikke laget toString
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
 				
 				
@@ -269,28 +267,37 @@ public class UserCreateEvent extends SuperUser {
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of the participant");
 			}
 			if (nextInput.equals("N") || nextInput.equals("n")){
-				this.state = State.ENTER_ROOM_NUMBER;
+				this.state = State.ENTER_NUMBER_OF_SEATS;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the number of desired seats");
 			}else{
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write Y/N");
 			}
 			break;
-		case ENTER_ROOM_NUMBER:
+		case ENTER_NUMBER_OF_SEATS:
 			if (nextInput.length() <= 11)
 				try{
-					ServerRoomResult result = this.server.findRoomResult(nextInput);
-					if (result.roomIsAvailable){
+					ServerRoomResult result = this.server.findRoomResult(nextInput, this.eventConstructor.startDate, this.eventConstructor.endDate);
+					if (result.didSucceed == true){	
+						if (result.roomIsAvailable){	
+							System.out.println(result.toString());			
+							this.state = State.ENTER_ROOM_NUMBER;
+							this.delegator.delegateIsReadyForNextInputWithPrompt("Choose room number");
+	//						ServerResult theResult = this.server.createEvent(this.eventConstructor); //itererer over hver private først
+	//						this.delegator.delegateIsDone("Event created");
+						}else{
+							this.delegator.delegateIsReadyForNextInputWithPrompt("No room is available with the specified number of seats. Try another number");
+						}
 						
-						this.eventConstructor.room.roomNumber = result.roomnumber;
-						this.eventConstructor.room.numberOfSeats = Integer.parseInt(nextInput);
-						ServerResult theResult = this.server.createEvent(this.eventConstructor);
-						this.delegator.delegateIsDone("Event created");
+					}else{
+						this.delegator.delegateIsReadyForNextInputWithPrompt("Problem with the server");
 					}
 					//int numberOfSeats = Integer.parseInt(nextInput);
-//					ServerRoomResult result = this.server			//TIME + Duration
+	//					ServerRoomResult result = this.server			//TIME + Duration
 				}catch (NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Must write a number");
 				}
+		case ENTER_ROOM_NUMBER:
+			this.delegator.delegateIsDone("snart ferdig");
 			
 		}
 		

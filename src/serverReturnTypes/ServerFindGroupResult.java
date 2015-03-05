@@ -11,7 +11,7 @@ public class ServerFindGroupResult extends ServerResult {
 	public String groupName;
 	
 	public void addGroupName(String groupName){
-		this.groupName.add(groupName);
+		this.groupNames.add(groupName);
 	}
 	public void addGroupUsers(String groupUser){
 		this.groupUsers.add(groupUser);
