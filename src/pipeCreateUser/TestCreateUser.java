@@ -1,5 +1,10 @@
 package pipeCreateUser;
 
+
+import static org.junit.Assert.*;
+import junit.framework.TestCase;
+import org.mockito.*;
+import org.junit.Test;
 import mainControlStructure.ControllerInterface;
 import org.junit.*;  
 import static org.junit.Assert.*;
