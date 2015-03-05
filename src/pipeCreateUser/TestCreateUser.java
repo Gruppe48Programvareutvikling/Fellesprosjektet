@@ -19,7 +19,7 @@ public class TestCreateUser {
 	// TO DELETE THESE TEST USER, EXECUTE THE FOLLOWING QUERY
 	// DELETE FROM User WHERE userName LIKE 'tester_%';
 	
-	private UserCreateUser creator;
+	private UserCreateUser createUserPipe;
 	
 	private String username;
 	private String password = "tester";
@@ -32,7 +32,7 @@ public class TestCreateUser {
 	@Before
 	public void runBefore() {		
 		MockitoAnnotations.initMocks(this);
-		this.creator = new UserCreateUser(this.controller);
+		this.createUserPipe = new UserCreateUser(this.controller);
 	}
 	
 	@Test
@@ -40,20 +40,20 @@ public class TestCreateUser {
 		
 		// TESTING THE STANDARD PROCESS
 		this.username = this.getRandomUsername();
-		this.creator.startRunning();		
-		this.creator.userAsksForHelp();
-		this.creator.sendNextInput(this.username);
-		this.creator.userAsksForHelp();
-		this.creator.sendNextInput(this.password);
-		this.creator.userAsksForHelp();
-		this.creator.sendNextInput(this.mail);
-		this.creator.userAsksForHelp();
-		this.creator.sendNextInput(this.phone);
+		this.createUserPipe.startRunning();		
+		this.createUserPipe.userAsksForHelp();
+		this.createUserPipe.sendNextInput(this.username);
+		this.createUserPipe.userAsksForHelp();
+		this.createUserPipe.sendNextInput(this.password);
+		this.createUserPipe.userAsksForHelp();
+		this.createUserPipe.sendNextInput(this.mail);
+		this.createUserPipe.userAsksForHelp();
+		this.createUserPipe.sendNextInput(this.phone);
 		
 		// TESTING USERNAME EXISTS
-		this.creator = new UserCreateUser(this.controller);
-		this.creator.startRunning();
-		this.creator.sendNextInput(this.username);
+		this.createUserPipe = new UserCreateUser(this.controller);
+		this.createUserPipe.startRunning();
+		this.createUserPipe.sendNextInput(this.username);
 		
 		
 		ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
