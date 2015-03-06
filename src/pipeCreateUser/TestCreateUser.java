@@ -32,6 +32,7 @@ public class TestCreateUser {
 	@Before
 	public void runBefore() {		
 		MockitoAnnotations.initMocks(this);
+		this.username = this.getRandomUsername();
 		this.createUserPipe = new UserCreateUser(this.controller);
 	}
 	
@@ -39,7 +40,6 @@ public class TestCreateUser {
 	public void tester() {
 		
 		// TESTING THE STANDARD PROCESS
-		this.username = this.getRandomUsername();
 		this.createUserPipe.startRunning();		
 		this.createUserPipe.userAsksForHelp();
 		this.createUserPipe.sendNextInput(this.username);
@@ -56,23 +56,48 @@ public class TestCreateUser {
 		this.createUserPipe.sendNextInput(this.username);
 		
 		
-		ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
-		verify(this.controller, times(10)).delegateIsReadyForNextInputWithPrompt(argumentCaptor.capture());
-
-		List<String> capturedArguments = argumentCaptor.getAllValues();
-		assertEquals(UserCreateUser.PROMPT_USERNAME, 	   capturedArguments.get(0));
-		assertEquals(UserCreateUser.HELP_USERNAME,   	   capturedArguments.get(1));
-		assertEquals(UserCreateUser.PROMPT_PASSWORD, 	   capturedArguments.get(2));
-		assertEquals(UserCreateUser.HELP_PASSWORD,   	   capturedArguments.get(3));
-		assertEquals(UserCreateUser.PROMPT_MAIL,     	   capturedArguments.get(4));
-		assertEquals(UserCreateUser.HELP_MAIL,       	   capturedArguments.get(5));
-		assertEquals(UserCreateUser.PROMPT_PHONE,    	   capturedArguments.get(6));
-		assertEquals(UserCreateUser.HELP_PHONE,      	   capturedArguments.get(7));
+		ArgumentCaptor<String> delegateIsReadyCaptor = ArgumentCaptor.forClass(String.class);
+		verify(this.controller, times(10)).delegateIsReadyForNextInputWithPrompt(delegateIsReadyCaptor.capture());
+		List<String> delegateIsReadyArguments = delegateIsReadyCaptor.getAllValues();
 		
-		assertEquals(UserCreateUser.PROMPT_USERNAME,       capturedArguments.get(8));
-		assertEquals(UserCreateUser.ERROR_USERNAME_EXISTS, capturedArguments.get(9));
+		assertEquals("delegateIsReady... received unexpected argument after startRunning(). Should be prompting for username", 
+				UserCreateUser.PROMPT_USERNAME, 	   delegateIsReadyArguments.get(0));
 		
-		verify(this.controller, times(1)).delegateIsDone(UserCreateUser.DONE_SUCCESS);
+		assertEquals("delegateIsReady... received unexpected argument after asking for help about username", 
+				UserCreateUser.HELP_USERNAME,   	   delegateIsReadyArguments.get(1));
+		
+		assertEquals("delegateIsReady... received unexpected argument after entering username", 
+				UserCreateUser.PROMPT_PASSWORD, 	   delegateIsReadyArguments.get(2));
+		
+		assertEquals("delegateIsReady... received unexpected argument after asking for help about password", 
+				UserCreateUser.HELP_PASSWORD,   	   delegateIsReadyArguments.get(3));
+		
+		assertEquals("delegateIsReady... received unexpected argument after entering password", 
+				UserCreateUser.PROMPT_MAIL,     	   delegateIsReadyArguments.get(4));
+		
+		assertEquals("delegateIsReady... received unexpected argument after asking for help about mail", 
+				UserCreateUser.HELP_MAIL,       	   delegateIsReadyArguments.get(5));
+		
+		assertEquals("delegateIsReady... received unexpected argument after entering mail", 
+				UserCreateUser.PROMPT_PHONE,    	   delegateIsReadyArguments.get(6));
+		
+		assertEquals("delegateIsReady... received unexpected argument after asking for help about phone number", 
+				UserCreateUser.HELP_PHONE,      	   delegateIsReadyArguments.get(7));
+		
+		
+		assertEquals("delegateIsReady... received unexpected argument after startRunning(). Should be prompting for username", 
+				UserCreateUser.PROMPT_USERNAME,       delegateIsReadyArguments.get(8));
+		
+		assertEquals("delegateIsReady... received unexpected argument after entering a username that already exists", 
+				UserCreateUser.ERROR_USERNAME_EXISTS, delegateIsReadyArguments.get(9));
+		
+		
+		ArgumentCaptor<String> delegateIsDoneCaptor = ArgumentCaptor.forClass(String.class);
+		verify(this.controller, times(1)).delegateIsDone(delegateIsDoneCaptor.capture());
+		List<String> delegateIsDoneArguments = delegateIsDoneCaptor.getAllValues();
+		
+		assertEquals("delegateIsDone received unexpected argument when done creating user", 
+				UserCreateUser.DONE_SUCCESS, delegateIsDoneArguments.get(0));
 	}
 
 	public String getRandomUsername() {
@@ -87,5 +112,6 @@ public class TestCreateUser {
 		return username;
 	}
 	
-	@After public void theMethodDirectlyUnderAtBeforeWillForSomeIncomprehensibleReasonNotBeCalledIfSomeMethod_ThisMethod_IsNotPresentDirectlyUnderAtAfter() { }
+	@After 
+	public void theMethodDirectlyUnderAtBeforeWillForSomeIncomprehensibleReasonNotBeCalledIfSomeMethod_ThisMethod_IsNotPresentDirectlyUnderAtAfter() { }
 }

@@ -49,7 +49,7 @@ public class UserLogin extends SuperUser {
 						this.delegator.delegateIsDone(UserLogin.ERROR_TOO_MANY_TRIES);
 					} else {
 						this.state = State.ENTER_USERNAME;
-						this.delegator.delegateIsReadyForNextInputWithPrompt(UserLogin.ERROR_WRONG_PW_PART_ONE + " " + this.retryCount + " " + UserLogin.ERROR_WRONG_PW_PART_TWO);
+						this.delegator.delegateIsReadyForNextInputWithPrompt(UserLogin.ERROR_WRONG_PW_PART_ONE + this.retryCount + UserLogin.ERROR_WRONG_PW_PART_TWO);
 					}
 				}
 			} else {
