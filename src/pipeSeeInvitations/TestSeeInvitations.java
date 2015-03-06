@@ -1,21 +1,14 @@
 package pipeSeeInvitations;
 
 import java.util.*;
-
 import static org.junit.Assert.*;
 import junit.framework.TestCase;
-
 import org.mockito.*;
 import org.junit.Test;
-
 import mainControlStructure.ControllerInterface;
-
 import org.junit.*;  
-
 import static org.junit.Assert.*;
-
 import org.mockito.*;
-
 import dataStructures.User;
 import static org.mockito.Mockito.*;
 
