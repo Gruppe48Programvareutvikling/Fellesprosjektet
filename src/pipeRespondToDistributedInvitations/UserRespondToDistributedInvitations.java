@@ -52,6 +52,7 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 				 this.state = State.SELECT_INVITATIONS;
 				 this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Select the id of the invitation you want to respond to." + "\n" + "Type 'none' if you don't want to respond at this time");
 			 }
+			 break;
 		case SELECT_INVITATIONS:
 			if (nextInput.equals("none")){
 				this.state = State.NO_INVITATIONS;
@@ -68,6 +69,7 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 					
 			this.state = State.RESPONDTO_INVITATIONS;
 			this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Sweet, now please enter your response");
+			break;
 		case RESPONDTO_INVITATIONS:
 			this.invitationReply = nextInput.toLowerCase();
 		
@@ -87,6 +89,7 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 				this.state = State.RESPONDTO_INVITATIONS;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Try again");
 			}
+			break;
 		}
 	}
 	
@@ -94,6 +97,7 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 		switch (this.state){
 		case FETCH_INVITATIONS:
 			this.delegator.delegateIsReadyForNextInputWithPrompt("You should enter the username who's invitations you want to respond to");
+			break;
 		case SELECT_INVITATIONS:
 			this.delegator.delegateIsReadyForNextInputWithPrompt("Type the eventId of the event you want to select");
 			break;

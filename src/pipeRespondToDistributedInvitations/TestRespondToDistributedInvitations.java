@@ -52,16 +52,16 @@ public class TestRespondToDistributedInvitations {
 	this.viewer.sendNextInput(this.response);
 		
 	ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
-	verify(this.controller, times(10)).delegateIsReadyForNextInputWithPrompt(argumentCaptor.capture());
+	verify(this.controller, times(6)).delegateIsReadyForNextInputWithPrompt(argumentCaptor.capture());
 	
 	List<String> capturedArguments = argumentCaptor.getAllValues();
 
 	assertEquals(UserRespondToDistributedInvitations.PROMPT_SELECT_FOREIGN_USERNAME,      capturedArguments.get(0));
 	assertEquals(UserRespondToDistributedInvitations.HELP_SELECT_FOREIGN_USERNAME,        capturedArguments.get(1));
-	assertEquals(UserRespondToDistributedInvitations.PROMPT_SELECT_INVITATION,            capturedArguments.get(3));
-	//assertEquals(UserRespondToDistributedInvitations.HELP_SELECT_INVITATION,              capturedArguments.get(4));
-	//assertEquals(UserRespondToDistributedInvitations.PROMPT_RESPOND_TO_INVITATIONS,       capturedArguments.get(5));
-	//assertEquals(UserRespondToDistributedInvitations.HELP_RESPOND_TO_INVITATION,          capturedArguments.get(8));
+	assertEquals(UserRespondToDistributedInvitations.PROMPT_SELECT_INVITATION,            capturedArguments.get(2));
+	assertEquals(UserRespondToDistributedInvitations.HELP_SELECT_INVITATION,              capturedArguments.get(3));
+	assertEquals(UserRespondToDistributedInvitations.PROMPT_RESPOND_TO_INVITATIONS,       capturedArguments.get(4));
+	assertEquals(UserRespondToDistributedInvitations.HELP_RESPOND_TO_INVITATION,          capturedArguments.get(5));
 	
 	verify(this.controller, times(1)).delegateIsDone(UserSeeInvitations.DONE_SUCCESS);
 	

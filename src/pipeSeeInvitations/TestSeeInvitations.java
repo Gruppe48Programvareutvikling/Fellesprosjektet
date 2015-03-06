@@ -40,14 +40,14 @@ public class TestSeeInvitations {
 	this.viewer.sendNextInput(this.response);
 		
 	ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
-	verify(this.controller, times(5)).delegateIsReadyForNextInputWithPrompt(argumentCaptor.capture());
+	verify(this.controller, times(4)).delegateIsReadyForNextInputWithPrompt(argumentCaptor.capture());
 	
 	List<String> capturedArguments = argumentCaptor.getAllValues();
 
 	assertEquals(UserSeeInvitations.PROMPT_SELECT_INVITATION,      capturedArguments.get(0));
 	assertEquals(UserSeeInvitations.HELP_SELECT_INVITATION,        capturedArguments.get(1));
 	assertEquals(UserSeeInvitations.PROMPT_RESPOND_TO_INVITATIONS, capturedArguments.get(2));
-	assertEquals(UserSeeInvitations.HELP_RESPOND_TO_INVITATION,    capturedArguments.get(4));
+	assertEquals(UserSeeInvitations.HELP_RESPOND_TO_INVITATION,    capturedArguments.get(3));
 	
 	verify(this.controller, times(1)).delegateIsDone(UserSeeInvitations.DONE_SUCCESS);
 	
