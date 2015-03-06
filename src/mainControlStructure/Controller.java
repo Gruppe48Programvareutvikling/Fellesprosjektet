@@ -68,6 +68,10 @@ public class Controller implements ControllerInterface {
 		System.out.println("You are logged in as \"" + username + "\"");
 	}
 	
+	public void delegateIsWaitingForServerWithMessage(String message) {
+		System.out.println(message);
+	}
+	
 	
 	
 	
