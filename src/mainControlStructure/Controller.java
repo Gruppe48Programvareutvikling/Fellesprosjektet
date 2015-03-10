@@ -5,6 +5,7 @@ import java.util.Scanner;
 import dataStructures.User;
 import pipeCheckAvailability.UserCheckAvailability;
 import pipeCheckRSVPStatusForEvents.UserCheckRSVPStatusForEvents;
+import pipeCreateCalander.UserCreateCalendar;
 import pipeCreateEvent.UserCreateEvent;
 import pipeCreateGroup.UserCreateGroup;
 import pipeCreateUser.UserCreateUser;
@@ -19,20 +20,21 @@ import pipeSeeInvitations.UserSeeInvitations;
 public class Controller implements ControllerInterface {
 	
 	// All of these should be in lowercase
-	private static final String COMMAND_CREATE_USER 						= "create user";
-	private static final String COMMAND_CHECK_AVAILABILITY 					= "check availability";
-	private static final String COMMAND_CREATE_EVENT						= "create event";
-	private static final String COMMAND_SEE_INVITATIONS						= "see invitations";
-	private static final String COMMAND_LOGIN								= "login";
-	private static final String COMMAND_CREATE_GROUP						= "create group";
-	private static final String COMMAND_EDIT_EVENT							= "edit event";
-	private static final String COMMAND_CHECK_RSVP_STATUS_FOR_EVENTS		= "check rsvp status for events";
-	private static final String COMMAND_EVENTS_FOR_THE_DAY					= "events for the day";
-	private static final String COMMAND_GET_NOTIFICATIONS					= "see notifications";
-	private static final String COMMAND_RESPOND_TO_DISTRIBUTED_INVITATIONS  = "respond to distributed invitations";
+	public static final String COMMAND_CREATE_USER 						= "create user";
+	public static final String COMMAND_CREATE_CALENDAR 					= "create calendar";
+	public static final String COMMAND_CHECK_AVAILABILITY 					= "check availability";
+	public static final String COMMAND_CREATE_EVENT						= "create event";
+	public static final String COMMAND_SEE_INVITATIONS						= "see invitations";
+	public static final String COMMAND_LOGIN								= "login";
+	public static final String COMMAND_CREATE_GROUP						= "create group";
+	public static final String COMMAND_EDIT_EVENT							= "edit event";
+	public static final String COMMAND_CHECK_RSVP_STATUS_FOR_EVENTS		= "check rsvp status for events";
+	public static final String COMMAND_EVENTS_FOR_THE_DAY					= "events for the day";
+	public static final String COMMAND_GET_NOTIFICATIONS					= "see notifications";
+	public static final String COMMAND_RESPOND_TO_DISTRIBUTED_INVITATIONS  = "respond to distributed invitations";
 	
-	private static final String COMMAND_LOGOUT								= "logout";
-	private static final String COMMAND_HELP								= "help";
+	public static final String COMMAND_LOGOUT								= "logout";
+	public static final String COMMAND_HELP								= "help";
 	
 	
 	
@@ -68,6 +70,10 @@ public class Controller implements ControllerInterface {
 		System.out.println("You are logged in as \"" + username + "\"");
 	}
 	
+	public void delegateIsWaitingForServerWithMessage(String message) {
+		System.out.println(message);
+	}
+	
 	
 	
 	
@@ -101,6 +107,9 @@ public class Controller implements ControllerInterface {
 					break;
 				case COMMAND_CREATE_GROUP:
 					this.delegate = new UserCreateGroup(this);
+					break;
+				case COMMAND_CREATE_CALENDAR:
+					this.delegate = new UserCreateCalendar(this);
 					break;
 				case COMMAND_EDIT_EVENT:
 					this.delegate = new UserEditEvent(this);
@@ -166,6 +175,7 @@ public class Controller implements ControllerInterface {
 			if (this.userIsLoggedIn) {
 				currentOptions += "- " + COMMAND_CHECK_AVAILABILITY + "\n";
 				currentOptions += "- " + COMMAND_CREATE_EVENT + "\n";
+				currentOptions += "- " + COMMAND_CREATE_CALENDAR + "\n";
 				currentOptions += "- " + COMMAND_SEE_INVITATIONS + "\n";
 				currentOptions += "- " + COMMAND_CREATE_GROUP + "\n";
 				currentOptions += "- " + COMMAND_EDIT_EVENT + "\n";
