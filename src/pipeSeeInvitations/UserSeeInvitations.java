@@ -59,6 +59,7 @@ public class UserSeeInvitations extends SuperUser {
 					
 			this.state = State.RESPONDTO_INVITATIONS;
 			this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Sweet, now please enter your response");
+			break;
 		case RESPONDTO_INVITATIONS:
 			this.invitationReply = nextInput.toLowerCase();
 		
@@ -79,6 +80,7 @@ public class UserSeeInvitations extends SuperUser {
 				this.state = State.RESPONDTO_INVITATIONS;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Try again");
 			}
+			break;
 		}
 	}
 	

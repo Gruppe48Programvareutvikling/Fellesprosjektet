@@ -30,10 +30,9 @@ public class ServerLogin extends ServerManager {
 				gotResult = true;
 				theResult.isAvailable = true;
 				theResult.didSucceed = true;
-				
-				
-				}
-			if(gotResult == false){
+			}
+			
+			if (gotResult == false) {
 					theResult.isAvailable = false;
 					theResult.didSucceed = true;
 			} 
