@@ -58,7 +58,7 @@ public class UserSeeInvitations extends SuperUser {
 			}
 					
 			this.state = State.RESPONDTO_INVITATIONS;
-			this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Sweet, now please enter your response");
+			this.delegator.delegateIsReadyForNextInputWithPrompt(PROMPT_RESPOND_TO_INVITATIONS);
 			break;
 		case RESPONDTO_INVITATIONS:
 			this.invitationReply = nextInput.toLowerCase();
