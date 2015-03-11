@@ -33,7 +33,7 @@ public class TestRespondToDistributedInvitations {
 	public void runBefore() {
 		MockitoAnnotations.initMocks(this);
 		this.viewer = new UserRespondToDistributedInvitations(this.controller);
-		User.currentUser().username = "marty";
+		User.currentUser().username = "vegard";
 	}
 	
 	@Test
