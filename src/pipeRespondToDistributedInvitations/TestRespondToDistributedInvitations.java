@@ -12,9 +12,7 @@ import org.junit.Test;
 import mainControlStructure.ControllerInterface;
 
 import org.junit.*;  
-
 import static org.junit.Assert.*;
-
 import org.mockito.*;
 
 import pipeSeeInvitations.UserSeeInvitations;
