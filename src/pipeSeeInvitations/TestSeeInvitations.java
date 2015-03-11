@@ -25,7 +25,7 @@ public class TestSeeInvitations {
 	public void runBefore() {
 		MockitoAnnotations.initMocks(this);
 		this.viewer = new UserSeeInvitations(this.controller);
-		User.currentUser().username = "marty";
+		User.currentUser().username = "vegather";
 	}
 	
 	@Test
