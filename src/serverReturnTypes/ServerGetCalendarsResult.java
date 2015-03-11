@@ -8,5 +8,6 @@ import com.mysql.fabric.xmlrpc.base.Array;
 import superClasses.ServerResult;
 
 public class ServerGetCalendarsResult extends ServerResult {
-	public String calendarnames;
+	public String groupCalendarName;
+	public String privateCalendarName;
 }

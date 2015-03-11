@@ -1,5 +1,6 @@
 package pipeCreateEvent;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -10,10 +11,17 @@ import java.util.List;
 
 
 
+
+
+
+
 import javafx.scene.web.PromptData;
 import dataStructures.Event;
+import dataStructures.Invitation;
+import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
+import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
@@ -28,7 +36,10 @@ public class UserCreateEvent extends SuperUser {
 	State state = State.ENTER_NAME;
 	private Event eventConstructor = new Event();
 	private ServerCreateEvent server = new ServerCreateEvent();
+	private Invitation invitationConstructor = new Invitation();
+	private Notification notificationConstructor = new Notification();
 	private int daysInMonth = 0;
+	private int possibleRoomNumber = 0;
 	public UserCreateEvent(ControllerInterface delegator) {
 		this.delegator = delegator;
 		
@@ -45,7 +56,13 @@ public class UserCreateEvent extends SuperUser {
 			if (nextInput.length() <= 45){ 
 				this.eventConstructor.name = nextInput;
 				this.state = State.ENTER_DESCRIPTION;
+				this.eventConstructor.participants.add(User.currentUser());
+				ServerGetCalendarsResult theResult = this.server.findPrivateCalendar(User.currentUser().username);
+				this.eventConstructor.calendarNames.add(theResult.privateCalendarName);
+				this.eventConstructor.privateCalendarName = theResult.privateCalendarName;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write a description of you event (maximum of 200 characters)");
+				
+				
 			}
 			else{
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of your event was too long. Please write a shorter name");
@@ -103,11 +120,13 @@ public class UserCreateEvent extends SuperUser {
 				}
 				}catch (NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Please use numbers");
-			}
+				}catch (Exception e) {
+					// TODO: handle exception
+				}
 			break;
 			
 		case ENTER_SCLOCK:
-			String[] sTime = nextInput.split("\\.");
+			String[] sTime = nextInput.split("\\."); //må lage test
 			
 				
 					try{
@@ -124,7 +143,11 @@ public class UserCreateEvent extends SuperUser {
 						}
 					}catch(NumberFormatException e){
 						this.delegator.delegateIsReadyForNextInputWithPrompt("Please write it as hh.mm");
-					}	
+					}catch (NullPointerException e) {
+						this.delegator.delegateIsReadyForNextInputWithPrompt("Please write it as hh.mm");
+						
+					}
+					
 			break;
 		case ENTER_ENDDATE: //kommer inn som dd/mm/yyyy
 			counter = 0;
@@ -222,14 +245,14 @@ public class UserCreateEvent extends SuperUser {
 		case ENTER_GROUP_NAME:
 			if (nextInput.length()<=45){
 				if(nextInput != null){
-					if(this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username).groupName.contains(nextInput)){
+					if(this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username).groupNames.contains(nextInput)){
 						ServerFindGroupResult result = this.server.getGroupUsers(nextInput);
 						addGroupUsers(result.groupUsers);
 						ServerGetCalendarsResult result2 = this.server.getGroupCalendarName(nextInput);
-						this.eventConstructor.groupCalendarName = result2.calendarnames;
+						this.eventConstructor.groupCalendarName = result2.groupCalendarName;
 					}
 					
-					this.state = State.ENTER_Participants;
+					this.state = State.ADD_MORE;
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of additional the participant");
 				}
 			}else{
@@ -238,13 +261,17 @@ public class UserCreateEvent extends SuperUser {
 			
 			break;
 		case ENTER_Participants:
+			
 			if (nextInput.length() <= 45){
 					//skjekk med server
 					ServerFindUserResult result = this.server.findUser(nextInput);
 					if (result.userExists == true){
 						if (!(existsInList(this.eventConstructor.participants, nextInput))){ //skjekk om bruker allerede er i lista
-					
+							
 							this.eventConstructor.participants.add(new User(nextInput));
+							ServerGetCalendarsResult theResult = this.server.findPrivateCalendar(nextInput);
+							this.eventConstructor.calendarNames.add(theResult.privateCalendarName);
+							
 							this.state = State.ADD_MORE;
 							this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants Y/N?");
 						}
@@ -274,16 +301,16 @@ public class UserCreateEvent extends SuperUser {
 			}
 			break;
 		case ENTER_NUMBER_OF_SEATS:
-			if (nextInput.length() <= 11)
+			if (nextInput.length() <= 11){
 				try{
 					ServerRoomResult result = this.server.findRoomResult(nextInput, this.eventConstructor.startDate, this.eventConstructor.endDate);
 					if (result.didSucceed == true){	
 						if (result.roomIsAvailable){	
-							System.out.println(result.toString());			
+							result.printRoomNumbersWithSeats(result.roomNumber, result.numberOfSeats);	
+							possibleRoomNumber = Integer.parseInt(nextInput);
 							this.state = State.ENTER_ROOM_NUMBER;
 							this.delegator.delegateIsReadyForNextInputWithPrompt("Choose room number");
-	//						ServerResult theResult = this.server.createEvent(this.eventConstructor); //itererer over hver private først
-	//						this.delegator.delegateIsDone("Event created");
+
 						}else{
 							this.delegator.delegateIsReadyForNextInputWithPrompt("No room is available with the specified number of seats. Try another number");
 						}
@@ -296,8 +323,53 @@ public class UserCreateEvent extends SuperUser {
 				}catch (NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Must write a number");
 				}
+			}
+			break;
 		case ENTER_ROOM_NUMBER:
-			this.delegator.delegateIsDone("snart ferdig");
+			
+			if (nextInput.length() <= 11){
+				try{	
+					if (this.server.findRoomResult(Integer.toString(possibleRoomNumber), this.eventConstructor.startDate, this.eventConstructor.endDate).roomNumber.contains(Integer.parseInt(nextInput))){ //må endres
+						this.eventConstructor.room.roomNumber = Integer.parseInt(nextInput);
+						this.eventConstructor.room.numberOfSeats = possibleRoomNumber;
+						
+						
+						this.notificationConstructor.date = this.eventConstructor.startDate;
+						this.notificationConstructor.message = "You got invited to an event by" + " " + User.currentUser().username;
+						for (int i = 0; i < this.eventConstructor.participants.size(); i++) {
+							this.notificationConstructor.username = this.eventConstructor.participants.get(i).username;
+							this.notificationConstructor.message = "You got invited to an event by" + " " + User.currentUser().username;
+							this.server.createNotification(notificationConstructor);
+						}
+						for (int i = 0; i < this.eventConstructor.groupUsers.size(); i++) {
+							this.notificationConstructor.username = this.eventConstructor.groupUsers.get(i).username;
+							this.server.createNotification(notificationConstructor);
+						}
+						this.server.createEvent(this.eventConstructor);
+						ServerEventsResult result = this.server.getEventId(this.eventConstructor);
+						this.invitationConstructor.id = result.eventId;
+						
+						for (int i = 0; i < this.eventConstructor.participants.size(); i++) {
+							this.invitationConstructor.invitert = this.eventConstructor.participants.get(i);
+							this.server.createInvitation(this.invitationConstructor);
+						}
+						for (int i = 0; i < this.eventConstructor.groupUsers.size(); i++) {
+							this.invitationConstructor.invitert = this.eventConstructor.groupUsers.get(i);
+							this.server.createInvitation(this.invitationConstructor);
+						}
+						
+						this.delegator.delegateIsDone("Event has been created");
+						
+						
+					}else{
+						this.delegator.delegateIsReadyForNextInputWithPrompt("try again");
+					}
+				}catch(NumberFormatException e){
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write a number");
+				}
+			}
+			break;
+		
 			
 		}
 		
@@ -348,7 +420,7 @@ public class UserCreateEvent extends SuperUser {
 	}
 	public void addGroupUsers(Collection<String> groupUsers){
 		for(String elem: groupUsers){
-			this.eventConstructor.participants.add(new User(elem));
+			this.eventConstructor.groupUsers.add(new User(elem));
 			
 		}
 	}
@@ -360,6 +432,7 @@ public class UserCreateEvent extends SuperUser {
 		}
 		return false;
 	}
+	
 	public void userAsksForHelp() {
 		
 	}
