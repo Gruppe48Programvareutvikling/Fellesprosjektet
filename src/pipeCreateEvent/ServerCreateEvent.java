@@ -238,11 +238,11 @@ public class ServerCreateEvent extends ServerManager {
 				statement.setString(2, eventToCreate.description);
 				statement.setString(3, dateToString(eventToCreate.startDate));
 				statement.setString(4, dateToString(eventToCreate.endDate));
-				statement.setString(5, eventToCreate.calendarNames.get(0)); //må finne privat navn
+				statement.setString(5, eventToCreate.privateCalendarName); //må finne privat navn
 				statement.setString(6, eventToCreate.groupCalendarName);
 				statement.setString(7, eventToCreate.location);
 				statement.setString(8, User.currentUser().username);
-				statement.setInt(9, eventToCreate.room.roomNumber);
+				statement.setInt(9, eventToCreate.roomNumber);
 				
 				int affected = statement.executeUpdate();
 				
@@ -295,8 +295,8 @@ public class ServerCreateEvent extends ServerManager {
 			statement.setString(5, event.privateCalendarName);
 			statement.setString(6, event.groupCalendarName);
 			statement.setString(7, event.location);
-			statement.setString(8, User.currentUser().username);
-			statement.setInt(9, event.room.roomNumber);
+			statement.setString(8, event.creator);
+			statement.setInt(9, event.roomNumber);
 			result = statement.executeQuery();
 			boolean gotResult = false;
 			while(result.next()){

@@ -9,6 +9,7 @@ import java.util.Date;
 import pipeCreateEvent.ServerCreateEvent;
 import dataStructures.Event;
 import dataStructures.Notification;
+import dataStructures.User;
 import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerGetCalendarsResult;
 import serverReturnTypes.ServerRoomResult;
@@ -17,29 +18,38 @@ import superClasses.ServerResult;
 
 public class ServerEditEvent extends ServerEvents {
 	private final String SQL_UPDATE_NAME = "UPDATE Event SET name =? WHERE eventId =?";
-	private final String SQL_GET_LIST_OF_EVENTS = "Select eventId, name, description, startDate, endDate, location, roomNumber FROM Event WHERE userName =?";
-	
+	private final String SQL_UPDATE_DESCRIPTION = "UPDATE Event SET description =? WHERE eventId =?";
+	private final String SQL_GET_LIST_OF_EVENTS = "Select * FROM Event WHERE userName =? AND privateCalendarName =?";
+	private Event eventConstructor = new Event ();
 	public ServerEventsResult getListOfEvents(String userName){
 		ServerEventsResult theResult = new ServerEventsResult();
 		ResultSet result = null;
 		try(
 				Connection connection = this.getDataBaseConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_NAME, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
+				PreparedStatement statement = connection.prepareStatement(SQL_GET_LIST_OF_EVENTS, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
 				){
 				statement.setString(1, userName);
-				
+				statement.setString(2, userName + "'s Calendar");
 				result = statement.executeQuery();
 				boolean gotResult = false;
+				this.eventConstructor.creator = userName;
 				while(result.next()){
 					gotResult = true;
 					theResult.didSucceed = true;
-					theResult.eventId = result.getInt(1);
-					theResult.name = result.getString(2);
-					theResult.description = result.getString(3)
-					theResult.startDate = result.getDate(4);
-					theResult.endDate = result.getDate(5);
-					theResult.location = result.getString(6);
-					theResult.roomNumber = result.getInt(7);
+					this.eventConstructor.eventId = result.getInt(1);
+					this.eventConstructor.name = result.getString(2);
+					this.eventConstructor.description = result.getString(3);
+					this.eventConstructor.startDate = result.getTimestamp(4);
+					this.eventConstructor.startDate.setYear(this.eventConstructor.startDate.getYear()+1900);
+					this.eventConstructor.startDate.setMonth((this.eventConstructor.startDate.getMonth()+1));
+					this.eventConstructor.endDate = result.getTimestamp(5);
+					this.eventConstructor.endDate.setYear(this.eventConstructor.endDate.getYear()+1900);
+					this.eventConstructor.endDate.setMonth((this.eventConstructor.endDate.getMonth()+1));
+					this.eventConstructor.privateCalendarName = result.getString(6);
+					this.eventConstructor.groupCalendarName = result.getString(7);
+					this.eventConstructor.location = result.getString(8);
+					this.eventConstructor.roomNumber = result.getInt(10);
+					theResult.events.add(eventConstructor);
 					
 					
 				}
@@ -57,7 +67,7 @@ public class ServerEditEvent extends ServerEvents {
 		return theResult;
 	}
 	
-	public ServerResult createNotification(String name, int eventId){
+	public ServerResult editName(String name, int eventId){
 		ServerResult result = new ServerResult();
 		try(
 				Connection connection = this.getDataBaseConnection();
@@ -70,7 +80,32 @@ public class ServerEditEvent extends ServerEvents {
 					result.didSucceed = true;
 				}else{
 					result.didSucceed = false;
-					result.errorMessage = "Unknown error while creating new name";
+					result.errorMessage = "Unknown error while changing new name";
+					
+				}
+		}catch (SQLException e) {
+			// TODO: handle exception
+		ServerCreateEvent.processSQLException(e);
+		result.didSucceed = false;
+		result.errorMessage = e.getMessage();
+		}
+		
+		return result;
+	}
+	public ServerResult editDescription(String description, int eventId){
+		ServerResult result = new ServerResult();
+		try(
+				Connection connection = this.getDataBaseConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_DESCRIPTION, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
+				){
+				statement.setString(1, description);
+				statement.setInt(2,eventId);
+				int affected = statement.executeUpdate();
+				if (affected == 1){
+					result.didSucceed = true;
+				}else{
+					result.didSucceed = false;
+					result.errorMessage = "Unknown error while changing new description";
 					
 				}
 		}catch (SQLException e) {
@@ -125,4 +160,5 @@ public class ServerEditEvent extends ServerEvents {
 		
 		return string;
 	}
+	
 }

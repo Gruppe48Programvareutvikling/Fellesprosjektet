@@ -6,18 +6,27 @@ import serverReturnTypes.ServerAvailabilityResult;
 import superClasses.SuperUser;
 
 public class UserLogin extends SuperUser {
+	
+	public static final String PROMPT_USERNAME 	       = "Username";
+	public static final String PROMPT_PASSWORD		   = "Password";
+	public static final String ERROR_TOO_MANY_TRIES    = "You have tried to log in too many times. You will be returned to the home screen";
+	public static final String ERROR_WRONG_PW_PART_ONE = "Wrong username or password, you have ";
+	public static final String ERROR_WRONG_PW_PART_TWO = " tries left. Try again!\nUsername";
+	public static final String HELP_USERNAME		   = "You should type in your username (can't be \"help\")";
+	public static final String HELP_PASSWORD		   = "You should type in your password (can't be \"help\")";
+	
 	private enum State {ENTER_USERNAME, ENTER_PASSWORD};
 	private ServerLogin server = new ServerLogin();
 	private State state = State.ENTER_USERNAME;
 	private String username, password;
-	int count = 3;
+	public int retryCount = 3; // Need this for testing as well
 	
 	public UserLogin(ControllerInterface delegator) {
 		this.delegator = delegator;
 	}
 	
 	public void startRunning() {
-		this.delegator.delegateIsReadyForNextInputWithPrompt("Username");
+		this.delegator.delegateIsReadyForNextInputWithPrompt(UserLogin.PROMPT_USERNAME);
 	}
 	
 	public void sendNextInput(String nextInput) {
@@ -25,7 +34,7 @@ public class UserLogin extends SuperUser {
 		case ENTER_USERNAME:
 			this.username = nextInput;
 			this.state = State.ENTER_PASSWORD;
-			this.delegator.delegateIsReadyForNextInputWithPrompt("Password");
+			this.delegator.delegateIsReadyForNextInputWithPrompt(UserLogin.PROMPT_PASSWORD);
 			break;
 		case ENTER_PASSWORD:
 			this.password = nextInput;
@@ -35,12 +44,12 @@ public class UserLogin extends SuperUser {
 					this.delegator.delegateDidLogInUser(this.username);
 					this.delegator.delegateIsDone(null);
 				} else {
-					this.count--;
-					if (this.count == 0) {
-						this.delegator.delegateIsDone("You have tried to log in too many times. You will be returned to the starting screen");
+					this.retryCount--;
+					if (this.retryCount == 0) {
+						this.delegator.delegateIsDone(UserLogin.ERROR_TOO_MANY_TRIES);
 					} else {
 						this.state = State.ENTER_USERNAME;
-						this.delegator.delegateIsReadyForNextInputWithPrompt("Wrong username or password, you have " + this.count + " tries left\nTry again\nUsername");
+						this.delegator.delegateIsReadyForNextInputWithPrompt(UserLogin.ERROR_WRONG_PW_PART_ONE + this.retryCount + UserLogin.ERROR_WRONG_PW_PART_TWO);
 					}
 				}
 			} else {
@@ -57,10 +66,10 @@ public class UserLogin extends SuperUser {
 	public void userAsksForHelp() {
 		switch(this.state) {
 		case ENTER_USERNAME:
-			this.delegator.delegateIsReadyForNextInputWithPrompt("You should type in your username (can't be \"help\")");
+			this.delegator.delegateIsReadyForNextInputWithPrompt(UserLogin.HELP_USERNAME);
 			break;
 		case ENTER_PASSWORD:
-			this.delegator.delegateIsReadyForNextInputWithPrompt("You should type in your password (can't be \"help\")");
+			this.delegator.delegateIsReadyForNextInputWithPrompt(UserLogin.HELP_PASSWORD);
 			break;
 		}
 	}
