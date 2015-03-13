@@ -1,9 +1,7 @@
 package dataStructures;
 
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
 
 
 	
@@ -46,4 +44,5 @@ public class Event {
 	public String 	 location;
 	public String 	 creator;
 	public Integer   roomNumber;
+	
 }

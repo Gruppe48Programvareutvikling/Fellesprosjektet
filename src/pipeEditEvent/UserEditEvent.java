@@ -5,7 +5,16 @@ import java.util.ArrayList;
 
 
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+
+
+
+
 import com.sun.javafx.scene.EnteredExitedHandler;
+
 
 import dataStructures.Event;
 import dataStructures.User;
@@ -20,7 +29,7 @@ public class UserEditEvent extends SuperUser {
 		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_NUMBER_OF_SEATS, 
 		ENTER_ROOM_NUMBER, ENTER_MORE}
 	State state = State.ENTER_EVENTID;
-	public Event eventConstructor = new Event();
+	
 	public ServerEditEvent server = new ServerEditEvent();
 	private int eventId;
 	private ArrayList<Integer> listOfEventId = new ArrayList<Integer>();
@@ -118,7 +127,7 @@ public class UserEditEvent extends SuperUser {
 				ServerResult result = this.server.editName(nextInput, eventId);
 				
 				if(result.didSucceed == true){
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Name has been changed, write another action");
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Name has been changed, enter another action");
 				}else{
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Error while changing the name of the event");
 				}
@@ -134,13 +143,75 @@ public class UserEditEvent extends SuperUser {
 				
 				this.state = State.ENTER_OPTION;
 				ServerResult result = this.server.editDescription(nextInput, eventId);
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write date for your event dd/mm/yyyy");
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Description has been changed, enter another action");
 			}
 			else{
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The description was too long. Please write a shorter name");
 			}
 			break;
+		case ENTER_STARTDATE:
+			Timestamp startDate = new Timestamp();
+			int counter = 0;
+			for( int i=0; i<nextInput.length(); i++ ) {
+			    if( nextInput.charAt(i) == '/' ) {
+			        counter++;
+			    } 
+			}
+			if (counter !=2){
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Wrong format. Please try again. dd/mm/yyyy");
+			}
+			String[] date = nextInput.split("/");
+			String sDay = date[0];
+			String sMonth = date[1];
+			String sYear = date[2];
+			
+			try{
+				int day = Integer.parseInt(sDay);
+				int month = Integer.parseInt(sMonth);
+				int year = Integer.parseInt(sYear);
+				if (year>0){
+				startDate.setYear(year-1900);
+				}
+				if (month >=1 && month <=12){
+					this.eventConstructor.startDate.setMonth(month-1);
+				
+					Calendar cal = new GregorianCalendar(this.eventConstructor.startDate.getYear(), month, 1);
+					int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+					if (day <= daysInMonth && day >0 ){
+						this.eventConstructor.startDate.setDate(day);
+						this.state = State.ENTER_OPTION;
+						this.delegator.delegateIsReadyForNextInputWithPrompt("Start date has been changed. Enter another action");			
+					}
+				}
+				else{this.delegator.delegateIsReadyForNextInputWithPrompt("Month does not exist");
+				
+				}
+				}catch (NumberFormatException e){
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Please use numbers");
+				}catch (NullPointerException e) {
+					// TODO: handle exception
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write it as dd/mm/yy");
+				}
+			break;
+		case ENTER_LOCATION:
+			if (nextInput.length() <=200){
+				
+				this.state = State.ENTER_OPTION;
+				ServerResult result = this.server.editLocation(nextInput, eventId);
+				if (result.didSucceed == true) {
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Location has been changed, enter another action");
+				}else {
+					this.delegator.delegateIsReadyForNextInputWithPrompt("SQL error");
+				}
+			}
+			else{
+				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of the location was too long. Please write a shorter name");
+			}
+			break;
+		
+			
 		}
+		
 		
 	}
 	public void printEvents(ArrayList<Event> eventsToPrint){

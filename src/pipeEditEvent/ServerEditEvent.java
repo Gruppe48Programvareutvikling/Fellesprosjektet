@@ -20,7 +20,7 @@ public class ServerEditEvent extends ServerEvents {
 	private final String SQL_UPDATE_NAME = "UPDATE Event SET name =? WHERE eventId =?";
 	private final String SQL_UPDATE_DESCRIPTION = "UPDATE Event SET description =? WHERE eventId =?";
 	private final String SQL_GET_LIST_OF_EVENTS = "Select * FROM Event WHERE userName =? AND privateCalendarName =?";
-	private Event eventConstructor = new Event ();
+	private final String SQL_UPDATE_LOCATION = "UPDATE Event SET location =? WHERE eventId =?";
 	public ServerEventsResult getListOfEvents(String userName){
 		ServerEventsResult theResult = new ServerEventsResult();
 		ResultSet result = null;
@@ -32,23 +32,25 @@ public class ServerEditEvent extends ServerEvents {
 				statement.setString(2, userName + "'s Calendar");
 				result = statement.executeQuery();
 				boolean gotResult = false;
-				this.eventConstructor.creator = userName;
+				
 				while(result.next()){
+					Event eventConstructor = new Event ();
+					eventConstructor.creator = userName;
 					gotResult = true;
 					theResult.didSucceed = true;
-					this.eventConstructor.eventId = result.getInt(1);
-					this.eventConstructor.name = result.getString(2);
-					this.eventConstructor.description = result.getString(3);
-					this.eventConstructor.startDate = result.getTimestamp(4);
-					this.eventConstructor.startDate.setYear(this.eventConstructor.startDate.getYear()+1900);
-					this.eventConstructor.startDate.setMonth((this.eventConstructor.startDate.getMonth()+1));
-					this.eventConstructor.endDate = result.getTimestamp(5);
-					this.eventConstructor.endDate.setYear(this.eventConstructor.endDate.getYear()+1900);
-					this.eventConstructor.endDate.setMonth((this.eventConstructor.endDate.getMonth()+1));
-					this.eventConstructor.privateCalendarName = result.getString(6);
-					this.eventConstructor.groupCalendarName = result.getString(7);
-					this.eventConstructor.location = result.getString(8);
-					this.eventConstructor.roomNumber = result.getInt(10);
+					eventConstructor.eventId = result.getInt(1);
+					eventConstructor.name = result.getString(2);
+					eventConstructor.description = result.getString(3);
+					eventConstructor.startDate = result.getTimestamp(4);
+					eventConstructor.startDate.setYear(eventConstructor.startDate.getYear()+1900);
+					eventConstructor.startDate.setMonth((eventConstructor.startDate.getMonth()+1));
+					eventConstructor.endDate = result.getTimestamp(5);
+					eventConstructor.endDate.setYear(eventConstructor.endDate.getYear()+1900);
+					eventConstructor.endDate.setMonth((eventConstructor.endDate.getMonth()+1));
+					eventConstructor.privateCalendarName = result.getString(6);
+					eventConstructor.groupCalendarName = result.getString(7);
+					eventConstructor.location = result.getString(8);
+					eventConstructor.roomNumber = result.getInt(10);
 					theResult.events.add(eventConstructor);
 					
 					
@@ -81,6 +83,31 @@ public class ServerEditEvent extends ServerEvents {
 				}else{
 					result.didSucceed = false;
 					result.errorMessage = "Unknown error while changing new name";
+					
+				}
+		}catch (SQLException e) {
+			// TODO: handle exception
+		ServerCreateEvent.processSQLException(e);
+		result.didSucceed = false;
+		result.errorMessage = e.getMessage();
+		}
+		
+		return result;
+	}
+	public ServerResult editLocation(String location, int eventId){
+		ServerResult result = new ServerResult();
+		try(
+				Connection connection = this.getDataBaseConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_LOCATION, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
+				){
+				statement.setString(1, location);
+				statement.setInt(2,eventId);
+				int affected = statement.executeUpdate();
+				if (affected == 1){
+					result.didSucceed = true;
+				}else{
+					result.didSucceed = false;
+					result.errorMessage = "Unknown error while changing new location";
 					
 				}
 		}catch (SQLException e) {
