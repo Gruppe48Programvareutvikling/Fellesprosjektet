@@ -1,49 +1,15 @@
 package pipeEditEvent;
 
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-
-
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.sun.javafx.scene.EnteredExitedHandler;
-
-
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerCalendarResult;
 import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
@@ -137,7 +103,7 @@ public class UserEditEvent extends SuperUser {
 //				break;
 			case "add":
 				this.state = State.ENTER_Participants;
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the username of the additional participant"); //være med?
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the username of the additional participant"); //vaere med?
 				break;
 //			case "group":
 //				this.state = State.ENTER_GROUP_NAME;
@@ -245,7 +211,7 @@ public class UserEditEvent extends SuperUser {
 				this.state = State.ENTER_ENDDATE;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter end date. dd/mm/yyyy");
 			}
-			String[] sTime = nextInput.split("\\."); //må lage test
+			String[] sTime = nextInput.split("\\."); //maa lage test
 			
 			
 			try{
@@ -283,16 +249,11 @@ public class UserEditEvent extends SuperUser {
 							this.notificationConstructor.message = "You got invited to an event by" + " " + this.eventEditor.creator;
 							this.server.createNotification(this.notificationConstructor);
 							
-							this.eventEditor.privateCalendarName = nextInput + "'s Calendar";
-							ServerResult creator = this.server.createEvent(this.eventEditor);
 							
-							ServerEventsResult gotResult;
-							if(this.eventEditor.roomNumber != 0){
-								gotResult = this.server.getEventIdWithRoom(this.eventEditor);
-							}else{
-								gotResult = this.server.getEventIdWithoutRoom(this.eventEditor);
-							}
-							this.invitationConstructor.id = gotResult.eventId;
+							ServerResult creator = this.server.createPrivateCalendarEvent(nextInput + "'s Calendar", this.eventEditor.eventId);
+							
+							
+							this.invitationConstructor.id = this.eventEditor.eventId;
 							this.invitationConstructor.invitert = new User(nextInput);
 							this.server.createInvitation(this.invitationConstructor);
 							
@@ -312,6 +273,21 @@ public class UserEditEvent extends SuperUser {
 		
 			}
 			break;
+		case ENTER_DELETE:
+			if (nextInput.length() == 0){
+				this.state = State.ENTER_OPTION;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("No deletion was done, enter new action");
+			}
+			if (nextInput.length() <= 45){
+				ServerFindUserResult result = this.server.findUser(nextInput);
+				if(result.userExists){
+					ServerFindUserResult theResult = this.server.isUserInvited(this.eventEditor);
+					if(theResult.userExists){
+						
+					}
+					
+				}
+			}
 		case ENTER_ENDDATE:
 			if (nextInput.length() == 0){
 				if (compareDates(this.eventEditor.startDate, this.eventEditor.endDate) >= 0) {
@@ -478,7 +454,7 @@ public class UserEditEvent extends SuperUser {
 			if (nextInput.length() <= 11){
 				try{ 
 					int num = Integer.parseInt(nextInput);
-					if (possibleRoomNumber.contains(num)){ //må endres
+					if (possibleRoomNumber.contains(num)){ //maa endres
 						this.eventEditor.roomNumber = num;
 							
 						this.server.editEvent(this.eventEditor);

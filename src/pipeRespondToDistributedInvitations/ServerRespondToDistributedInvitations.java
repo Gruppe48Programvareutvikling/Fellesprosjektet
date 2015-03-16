@@ -60,7 +60,7 @@ public class ServerRespondToDistributedInvitations extends ServerManager {
 		
 		try (
 				Connection connection = this.getDataBaseConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_RESPONDTO_INVITATIONS);
+				PreparedStatement statement = connection.prepareStatement(SQL_RESPONDTO_INVITATIONS, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 				)
 				{
 			statement.setString(1, response);
