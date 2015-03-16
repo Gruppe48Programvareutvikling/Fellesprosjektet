@@ -277,6 +277,7 @@ public class ServerEditEvent extends ServerEvents {
 			statement.setString(5, event.location);
 			statement.setString(6, event.creator);
 			statement.setInt(7, event.roomNumber);
+			statement.setString(10, "userName IS NULL");
 			result = statement.executeQuery();
 			
 			boolean gotResult = false;
