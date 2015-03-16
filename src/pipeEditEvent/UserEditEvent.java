@@ -1,49 +1,15 @@
 package pipeEditEvent;
 
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-
-
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import com.sun.javafx.scene.EnteredExitedHandler;
-
-
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerCalendarResult;
 import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
@@ -137,7 +103,7 @@ public class UserEditEvent extends SuperUser {
 //				break;
 			case "add":
 				this.state = State.ENTER_Participants;
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the username of the additional participant"); //være med?
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the username of the additional participant"); //vaere med?
 				break;
 //			case "group":
 //				this.state = State.ENTER_GROUP_NAME;
@@ -245,7 +211,7 @@ public class UserEditEvent extends SuperUser {
 				this.state = State.ENTER_ENDDATE;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter end date. dd/mm/yyyy");
 			}
-			String[] sTime = nextInput.split("\\."); //må lage test
+			String[] sTime = nextInput.split("\\."); //maa lage test
 			
 			
 			try{
@@ -478,7 +444,7 @@ public class UserEditEvent extends SuperUser {
 			if (nextInput.length() <= 11){
 				try{ 
 					int num = Integer.parseInt(nextInput);
-					if (possibleRoomNumber.contains(num)){ //må endres
+					if (possibleRoomNumber.contains(num)){ //maa endres
 						this.eventEditor.roomNumber = num;
 							
 						this.server.editEvent(this.eventEditor);
