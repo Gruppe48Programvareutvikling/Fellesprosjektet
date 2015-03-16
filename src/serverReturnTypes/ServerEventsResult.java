@@ -20,4 +20,5 @@ public class ServerEventsResult extends ServerResult {
 	public String location;
 	public int roomNumber;
 	public ArrayList<Event> events = new ArrayList<Event>();
+	public ArrayList<Integer> eventIds = new ArrayList<Integer>();
 }

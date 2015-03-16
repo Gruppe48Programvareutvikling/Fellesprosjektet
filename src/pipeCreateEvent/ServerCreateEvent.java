@@ -34,6 +34,7 @@ public class ServerCreateEvent extends ServerManager {
 	private final String SQL_CREATE_NOTIFICATION = "INSERT INTO Notification(date,message,userName) VALUES (?,?,?)";
 	private final String SQL_FIND_NOTIFICATIONID = "Select invitationId from Invitation where userName =?";
 	private final String SQL_FIND_EVENTID = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND privateCalendarName=? AND groupCalendarName =? AND location =? AND userName=? AND roomNumber=?";
+	private final String SQL_FIND_EVENTID_WITHOUT_ROOM = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND privateCalendarName=? AND groupCalendarName =? AND location =? AND userName=? AND roomNumber IS NULL";
 	
 	public ServerFindGroupResult getListOfGroupsTheUserIsPartOf(String userName){
 		ServerFindGroupResult theResult = new ServerFindGroupResult();
@@ -242,8 +243,11 @@ public class ServerCreateEvent extends ServerManager {
 				statement.setString(6, eventToCreate.groupCalendarName);
 				statement.setString(7, eventToCreate.location);
 				statement.setString(8, User.currentUser().username);
-				statement.setInt(9, eventToCreate.roomNumber);
-				
+				if(eventToCreate.roomNumber != 0){
+					statement.setInt(9, eventToCreate.roomNumber);
+				}else{
+					statement.setNull(9, java.sql.Types.INTEGER);
+				}
 				int affected = statement.executeUpdate();
 				
 				if (affected == 1){
@@ -281,7 +285,7 @@ public class ServerCreateEvent extends ServerManager {
 		}
 			return result;
 	}
-	public ServerEventsResult getEventId(Event event){
+	public ServerEventsResult getEventIdWithRoom(Event event){
 		ServerEventsResult theResult = new ServerEventsResult();
 		ResultSet result = null;
 		try(
@@ -297,6 +301,48 @@ public class ServerCreateEvent extends ServerManager {
 			statement.setString(7, event.location);
 			statement.setString(8, event.creator);
 			statement.setInt(9, event.roomNumber);
+			
+		
+			result = statement.executeQuery();
+			boolean gotResult = false;
+			while(result.next()){
+				gotResult = true;
+				theResult.eventId = result.getInt(1);
+				theResult.didSucceed = true;
+				
+			}
+			if (gotResult ==false){
+				theResult.didSucceed = true;
+				theResult.errorMessage = "No eventId was found";
+				
+			}
+			
+		}catch (SQLException e) {
+			// TODO: handle exception
+			ServerCreateEvent.processSQLException(e);
+			theResult.didSucceed = false;
+			theResult.errorMessage = e.getMessage();
+		}
+		return theResult;
+	}
+	public ServerEventsResult getEventIdWithoutRoom(Event event){
+		ServerEventsResult theResult = new ServerEventsResult();
+		ResultSet result = null;
+		try(
+				Connection connection = this.getDataBaseConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_FIND_EVENTID_WITHOUT_ROOM, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
+				){ //name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber
+			statement.setString(1, event.name);
+			statement.setString(2, event.description);
+			statement.setString(3, dateToString(event.startDate));
+			statement.setString(4, dateToString(event.endDate));
+			statement.setString(5, event.privateCalendarName);
+			statement.setString(6, event.groupCalendarName);
+			statement.setString(7, event.location);
+			statement.setString(8, event.creator);
+			
+			
+		
 			result = statement.executeQuery();
 			boolean gotResult = false;
 			while(result.next()){
@@ -380,7 +426,7 @@ public class ServerCreateEvent extends ServerManager {
 	}
 	
 	public String dateToString(Date date){
-		String string = Integer.toString(date.getYear()) + "-"	+ Integer.toString(date.getMonth()) + "-" + Integer.toString(date.getDate()) + " " + 
+		String string = Integer.toString(date.getYear()+1900) + "-"	+ Integer.toString(date.getMonth()+1) + "-" + Integer.toString(date.getDate()) + " " + 
 				Integer.toString(date.getHours()) + ":" + Integer.toString(date.getMinutes());
 		
 		

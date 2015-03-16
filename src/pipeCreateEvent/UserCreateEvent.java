@@ -222,7 +222,7 @@ public class UserCreateEvent extends SuperUser {
 							Date test = this.eventConstructor.endDate;
 							test.setHours(hour);
 							test.setMinutes(min);
-							if (compareDates(test,this.eventConstructor.startDate)==0 && isTimeAfter(test, this.eventConstructor.startDate)){
+							if (compareDates(test,this.eventConstructor.startDate)==0 && isTimeAfter(this.eventConstructor.startDate, test)){
 							
 								this.eventConstructor.endDate.setHours(hour);
 								this.eventConstructor.endDate.setMinutes(min);
@@ -312,7 +312,10 @@ public class UserCreateEvent extends SuperUser {
 			break;
 		case ENTER_NUMBER_OF_SEATS:
 			if (nextInput.length() <= 11){
-				try{
+				try{if (nextInput.length() == 0){
+					this.eventConstructor.roomNumber = 0;
+					createEvent();
+				}
 					ServerRoomResult result = this.server.findRoomResult(nextInput, this.eventConstructor.startDate, this.eventConstructor.endDate);
 					if (result.didSucceed == true){	
 						if (result.roomIsAvailable){	
@@ -338,59 +341,18 @@ public class UserCreateEvent extends SuperUser {
 		case ENTER_ROOM_NUMBER:
 			
 			if (nextInput.length() <= 11){
-				try{	
-					if (this.server.findRoomResult(Integer.toString(possibleRoomNumber), this.eventConstructor.startDate, this.eventConstructor.endDate).roomNumber.contains(Integer.parseInt(nextInput))){ //må endres
-						this.eventConstructor.roomNumber = Integer.parseInt(nextInput);
-						
-						
-						
-						this.notificationConstructor.date = this.eventConstructor.startDate;
-						this.notificationConstructor.message = "You got invited to an event by" + " " + User.currentUser().username;
-						for (int i = 0; i < participants.size(); i++) {
-							this.notificationConstructor.username = participants.get(i).username;
-							this.notificationConstructor.message = "You got invited to an event by" + " " + User.currentUser().username;
-							this.server.createNotification(notificationConstructor);
-						}
-						for (int i = 0; i < groupUsers.size(); i++) {
-							this.notificationConstructor.username = groupUsers.get(i).username;
-							this.server.createNotification(notificationConstructor);
-						}
-						for (int i = 0; i < participants.size(); i++) {
-							this.eventConstructor.privateCalendarName = privateCalendarNames.get(i);
-							this.eventConstructor.groupCalendarName = this.groupCalendarName;
-							this.server.createEvent(this.eventConstructor);
-						}
-						for (int i = 0; i < groupUsers.size(); i++) {
-							this.eventConstructor.privateCalendarName = this.groupUserPrivateCalendarNames.get(i);
-							this.eventConstructor.groupCalendarName = this.groupCalendarName;
-							this.server.createEvent(this.eventConstructor);
+				try{
+						if (this.server.findRoomResult(Integer.toString(possibleRoomNumber), this.eventConstructor.startDate, this.eventConstructor.endDate).roomNumber.contains(Integer.parseInt(nextInput))){ //må endres
+							this.eventConstructor.roomNumber = Integer.parseInt(nextInput);
 							
-						}
-						
-						this.eventConstructor.creator = User.currentUser().username;
-						
-						for (int i = 1; i < participants.size(); i++) {
-							this.eventConstructor.privateCalendarName = participants.get(i).username + "'s Calendar";
-							ServerEventsResult result = this.server.getEventId(this.eventConstructor);
+							createEvent();
 							
-							this.invitationConstructor.id = result.eventId;
-							this.invitationConstructor.invitert = participants.get(i);
-							this.server.createInvitation(this.invitationConstructor);
+							
+							
+							
+						}else{
+							this.delegator.delegateIsReadyForNextInputWithPrompt("try again");
 						}
-						for (int i = 0; i < groupUsers.size(); i++) {
-							this.eventConstructor.privateCalendarName = groupUsers.get(i).username + "'s Calendar";
-							ServerEventsResult result = this.server.getEventId(this.eventConstructor);
-							this.invitationConstructor.id = result.eventId;
-							this.invitationConstructor.invitert = groupUsers.get(i);
-							this.server.createInvitation(this.invitationConstructor);
-						}
-						
-						this.delegator.delegateIsDone("Event has been created");
-						
-						
-					}else{
-						this.delegator.delegateIsReadyForNextInputWithPrompt("try again");
-					}
 				}catch(NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write a number");
 				}
@@ -413,7 +375,7 @@ public class UserCreateEvent extends SuperUser {
 		int year2 = date2.getYear()+1900;
 		int month2 = date2.getMonth();
 		int day2 = date2.getDate();
-		if(year1>year2){
+		if(year1<year2){
 			return 1;
 		}
 		if (year1==year2){
@@ -434,11 +396,11 @@ public class UserCreateEvent extends SuperUser {
 		return -1;
 	}
 	public boolean isTimeAfter(Date date1, Date date2){
-		if(date1.getHours()>date2.getHours()){
+		if(date1.getHours()<date2.getHours()){
 			return true;
 		}
 		if(date1.getHours() == date2.getHours()){
-			if (date1.getMinutes()> date2.getMinutes()){
+			if (date1.getMinutes()< date2.getMinutes()){
 				return true;
 			}
 			
@@ -462,7 +424,65 @@ public class UserCreateEvent extends SuperUser {
 		return false;
 	}
 	
-	
+	public void createEvent(){
+		this.notificationConstructor.date = this.eventConstructor.startDate;
+		
+		
+		this.notificationConstructor.username = participants.get(0).username;
+		this.notificationConstructor.message = "Notification for your event:" + this.eventConstructor.name;
+		this.server.createNotification(notificationConstructor);
+		
+		for (int i = 1; i < participants.size(); i++) {
+			this.notificationConstructor.username = participants.get(i).username;
+			this.notificationConstructor.message = "You got invited to an event by" + " " + User.currentUser().username;
+			this.server.createNotification(notificationConstructor);
+		}
+		for (int i = 0; i < groupUsers.size(); i++) {
+			this.notificationConstructor.message = "You got invited to an event by" + " " + User.currentUser().username;
+			this.notificationConstructor.username = groupUsers.get(i).username;
+			this.server.createNotification(notificationConstructor);
+		}
+		for (int i = 0; i < participants.size(); i++) {
+			this.eventConstructor.privateCalendarName = privateCalendarNames.get(i);
+			this.eventConstructor.groupCalendarName = this.groupCalendarName;
+			this.server.createEvent(this.eventConstructor);
+		}
+		for (int i = 0; i < groupUsers.size(); i++) {
+			this.eventConstructor.privateCalendarName = this.groupUserPrivateCalendarNames.get(i); //
+			this.eventConstructor.groupCalendarName = this.groupCalendarName;
+			this.server.createEvent(this.eventConstructor);
+			
+		}
+		
+		this.eventConstructor.creator = User.currentUser().username;
+		ServerEventsResult result;
+		for (int i = 1; i < participants.size(); i++) {
+			this.eventConstructor.privateCalendarName = participants.get(i).username + "'s Calendar";
+			if(this.eventConstructor.roomNumber != -1){
+				result = this.server.getEventIdWithRoom(this.eventConstructor);
+			}else{
+				result = this.server.getEventIdWithoutRoom(this.eventConstructor);
+			}
+			
+			this.invitationConstructor.id = result.eventId;
+			this.invitationConstructor.invitert = participants.get(i);
+			this.server.createInvitation(this.invitationConstructor);
+		}
+		for (int i = 0; i < groupUsers.size(); i++) {
+			this.eventConstructor.privateCalendarName = groupUsers.get(i).username + "'s Calendar";
+			if (this.eventConstructor.roomNumber != -1){
+				result = this.server.getEventIdWithRoom(this.eventConstructor);
+			}else{
+				result = this.server.getEventIdWithoutRoom(this.eventConstructor);
+			}
+			
+			this.invitationConstructor.id = result.eventId;
+			this.invitationConstructor.invitert = groupUsers.get(i);
+			this.server.createInvitation(this.invitationConstructor);
+		}
+		
+		this.delegator.delegateIsDone("Event has been created");
+	}
 	
 	public void userAsksForHelp() {
 		
