@@ -7,17 +7,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-
-<<<<<<< HEAD
-=======
-
-
-
-
-
-
-
->>>>>>> master
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
