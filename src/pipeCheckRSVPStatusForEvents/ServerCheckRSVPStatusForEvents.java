@@ -51,7 +51,7 @@ public class ServerCheckRSVPStatusForEvents extends ServerEvents {
 				someEvent.description = result.getString("description");
 				someEvent.startDate = result.getTimestamp("startDate");
 				someEvent.endDate = result.getTimestamp("endDate");
-				someEvent.privateCalendarName = result.getString("privateCalendarName");
+				//someEvent.privateCalendarName = result.getString("privateCalendarName");
 				someEvent.groupCalendarName = result.getString("groupCalendarName");
 				someEvent.location = result.getString("location");
 				someEvent.creator = result.getString("userName");

@@ -1,22 +1,11 @@
 package pipeCreateEvent;
 
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-
-
-
-
-
-
-
 
 import dataStructures.Event;
 import dataStructures.Invitation;
@@ -133,7 +122,7 @@ public class UserCreateEvent extends SuperUser {
 			break;
 			
 		case ENTER_SCLOCK:
-			String[] sTime = nextInput.split("\\."); //må lage test
+			String[] sTime = nextInput.split("\\."); //maa lage test
 			
 				
 					try{
@@ -340,7 +329,7 @@ public class UserCreateEvent extends SuperUser {
 			
 			if (nextInput.length() <= 11){
 				try{
-						if (this.server.findRoomResult(Integer.toString(possibleRoomNumber), this.eventConstructor.startDate, this.eventConstructor.endDate).roomNumber.contains(Integer.parseInt(nextInput))){ //må endres
+						if (this.server.findRoomResult(Integer.toString(possibleRoomNumber), this.eventConstructor.startDate, this.eventConstructor.endDate).roomNumber.contains(Integer.parseInt(nextInput))){ //maa endres
 							this.eventConstructor.roomNumber = Integer.parseInt(nextInput);
 							
 							createEvent();
