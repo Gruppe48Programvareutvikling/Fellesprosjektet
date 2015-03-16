@@ -74,7 +74,7 @@ public class UserRespondToDistributedInvitations extends SuperUser {
 			this.invitationReply = nextInput.toLowerCase();
 		
 			if (this.invitationReply.equals("accept") || this.invitationReply.equals("decline") || this.invitationReply.equals("maybe")){
-				ServerInvitationsResult selection = this.server.respontoInvitation(selectedInvitation, invitationReply, User.currentUser().username);
+				ServerInvitationsResult selection = this.server.respontoInvitation(selectedInvitation, invitationReply, selectedUsername);
 				if (selection.didSucceed = true){
 					System.out.println("Changes applied successfully.");
 					this.delegator.delegateIsDone("Returning to main menu.");
