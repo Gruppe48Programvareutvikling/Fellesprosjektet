@@ -295,6 +295,7 @@ public class ServerCreateEvent extends ServerManager {
 			//}
 			
 		}catch (SQLException e) {
+			if()
 			ServerCreateEvent.processSQLException(e);
 			result.didSucceed = false;
 			result.errorMessage = e.getMessage();
@@ -354,7 +355,7 @@ public class ServerCreateEvent extends ServerManager {
 		return result;
 	}
 	
-	public ServerNotificationsResult createInvitation(Invitation invitationToCreate){
+	public ServerNotificationsResult createInvitation(Invitation invitationToCreate, String status){
 		ServerNotificationsResult result = new ServerNotificationsResult();
 		try (
 				Connection connection = this.getDataBaseConnection();
@@ -362,7 +363,7 @@ public class ServerCreateEvent extends ServerManager {
 				){
 				statement.setString(1, invitationToCreate.invitert.username);
 				statement.setInt(2, invitationToCreate.id);
-				statement.setString(3, "MAYBE");
+				statement.setString(3, status);
 				
 				int affected = statement.executeUpdate();
 				
