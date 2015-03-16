@@ -25,8 +25,8 @@ public class ServerCreateCalendar extends ServerManager{
 		try(
 				Connection connection = this.getDataBaseConnection();
 				PreparedStatement statement = connection.prepareStatement(SQL_CHECK_IF_PRIVATENAME_IS_AVAILABLE, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-				)
-				{
+			)
+			{
 			statement.setString(1, name);
 			result = statement.executeQuery();
 
