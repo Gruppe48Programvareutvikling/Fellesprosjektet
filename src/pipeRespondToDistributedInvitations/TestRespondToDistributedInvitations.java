@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 public class TestRespondToDistributedInvitations {
 	
 	private UserRespondToDistributedInvitations viewer;
-	private String selectedUsername = "marty";
+	private String selectedUsername = "vegather";
 	private String selectedInvitation = "1";
 	private String response = "maybe";
 	
@@ -33,7 +33,7 @@ public class TestRespondToDistributedInvitations {
 	public void runBefore() {
 		MockitoAnnotations.initMocks(this);
 		this.viewer = new UserRespondToDistributedInvitations(this.controller);
-		User.currentUser().username = "vegard";
+		User.currentUser().username = "vegather";
 	}
 	
 	@Test

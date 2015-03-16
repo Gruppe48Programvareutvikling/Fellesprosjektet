@@ -12,7 +12,7 @@ import superClasses.ServerResult;
 
 public class ServerCreateUser extends ServerManager {
 	
-	private final String SQL_CHECK_IF_USER_IS_AVAILABLE = "SELECT userName FROM User WHERE userName=?";
+	private final String SQL_CHECK_IF_USER_IS_AVAILABLE = "SELECT userName FROM User WHERE userName=?"; //fungerer uten anførelstegn?
 	private final String SQL_CREATE_USER				= "INSERT INTO User(userName, password, mail, phone) VALUES (?,?,?,?)";
 	private final String SQL_CREATE_PrivateCalendar		= "INSERT INTO PrivateCalendar(privateCalendarName, userName) VALUES (?,?)";
 	

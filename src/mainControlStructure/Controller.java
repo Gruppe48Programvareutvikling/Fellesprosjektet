@@ -68,7 +68,7 @@ public class Controller implements ControllerInterface {
 		this.userIsLoggedIn = true;
 		User.currentUser().username = username;
 		System.out.println("You are logged in as \"" + username + "\"");
-	}
+		}
 	
 	public void delegateIsWaitingForServerWithMessage(String message) {
 		System.out.println(message);
