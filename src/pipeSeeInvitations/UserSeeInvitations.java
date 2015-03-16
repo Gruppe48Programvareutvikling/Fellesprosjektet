@@ -11,7 +11,7 @@ public class UserSeeInvitations extends SuperUser {
 	
 	public static final String PROMPT_SEE_INVITATIONS = "Fetching from server...";
 	public static final String PROMPT_SELECT_INVITATION 		 = '\n' + "Select the id of the invitation you want to respond to." + "\n" + "Type 'none' if you don't want to respond at this time";
-	public static final String PROMPT_RESPOND_TO_INVITATIONS	 = '\n' + "Sweet, now please enter your response";
+	public static final String PROMPT_RESPOND_TO_INVITATIONS	 = '\n' + "Sweet, now please enter your response (ACCEPT, DECLINE, or MAYBE)";
 	public static final String HELP_SELECT_INVITATION		 = "Type the eventId of the event you want to select";
 	public static final String HELP_RESPOND_TO_INVITATION		 = "Type 'accept', 'decline' or 'maybe' to respond to the selected invitation";
 	public static final String DONE_SUCCESS = "Returning to main menu.";
@@ -58,7 +58,7 @@ public class UserSeeInvitations extends SuperUser {
 			}
 					
 			this.state = State.RESPONDTO_INVITATIONS;
-			this.delegator.delegateIsReadyForNextInputWithPrompt('\n' + "Sweet, now please enter your response");
+			this.delegator.delegateIsReadyForNextInputWithPrompt(PROMPT_RESPOND_TO_INVITATIONS);
 			break;
 		case RESPONDTO_INVITATIONS:
 			this.invitationReply = nextInput.toLowerCase();

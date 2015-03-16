@@ -243,7 +243,7 @@ public class ServerCreateGroup extends ServerManager {
 							}
 				} 
 				if (gotResult == false) {
-					System.out.println("into" + theResult.didSucceed);
+					System.out.println("The group you created have none members. " + theResult.didSucceed);
 					theResult.isAvailable = false;
 					theResult.didSucceed = true;
 				}

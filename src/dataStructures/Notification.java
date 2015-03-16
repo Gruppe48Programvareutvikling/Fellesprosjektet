@@ -1,6 +1,6 @@
 package dataStructures;
 
-import java.sql.Date;// mulig dette er feil date.
+import java.util.Date;// mulig dette er feil date.
 
 public class Notification {
 	
