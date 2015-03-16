@@ -298,7 +298,7 @@ public class ServerCreateEvent extends ServerManager {
 			//}
 			
 		}catch (SQLException e) {
-			
+
 			ServerCreateEvent.processSQLException(e);
 			result.didSucceed = false;
 			result.errorMessage = e.getMessage();
