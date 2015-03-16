@@ -30,8 +30,8 @@ public class ServerEditEvent extends ServerEvents {
 	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND ((? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate)) )";
 	private final String SQL_FIND_USER = "Select userName from User where userName =?";
 	private final String SQL_ISINVITED = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
-	//private final String SQL_LIST_OF_PARTICIPANTS = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
-	private final String SQL_LIST_OF_PARTICIPANTS = "SELECT userName FROM PrivateCalendarEvent WHERE eventId =?";
+	private final String SQL_LIST_OF_PARTICIPANTS = "Select userName From PrivateCalendar Where privateCalendarName IN(Select privateCalendarName FROM PrivateCalendarEvent WHERE eventId =?)";
+	//private final String SQL_LIST_OF_PARTICIPANTS = "SELECT privateCalendarName FROM PrivateCalendarEvent WHERE eventId =?";
 	private final String SQL_FIND_EVENTIDLIST = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?";
 	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?,?)";
 	private final String SQL_CREATE_NOTIFICATION = "INSERT INTO Notification(date,message,userName) VALUES (?,?,?)";
@@ -280,7 +280,7 @@ public class ServerEditEvent extends ServerEvents {
 			statement.setString(5, event.location);
 			statement.setString(6, event.creator);
 			statement.setInt(7, event.roomNumber);
-			statement.setString(10, "userName IS NULL");
+			
 			result = statement.executeQuery();
 			
 			boolean gotResult = false;

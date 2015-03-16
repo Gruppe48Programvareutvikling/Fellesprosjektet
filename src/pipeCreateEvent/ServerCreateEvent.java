@@ -298,11 +298,7 @@ public class ServerCreateEvent extends ServerManager {
 			//}
 			
 		}catch (SQLException e) {
-<<<<<<< HEAD
-			if()
-=======
-			
->>>>>>> origin/master
+
 			ServerCreateEvent.processSQLException(e);
 			result.didSucceed = false;
 			result.errorMessage = e.getMessage();

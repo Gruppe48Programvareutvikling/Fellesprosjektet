@@ -57,8 +57,7 @@ public class UserEditEvent extends SuperUser {
 				if (listOfEventId.contains(num)){
 				
 					eventEditor = getEvent( listOfEvents, num);
-					ServerEventsResult result = this.server.getEventIdListWithRoom(this.eventEditor);
-					listOfEventId = result.eventIds;
+					
 					this.state = State.ENTER_OPTION;
 					this.delegator.delegateIsReadyForNextInputWithPrompt("What do you want to edit?");
 				}
@@ -94,7 +93,8 @@ public class UserEditEvent extends SuperUser {
 				break;
 			case "delete":
 				this.state = State.ENTER_DELETE;
-				
+				ServerFindUserResult theResult = this.server.Participants(this.eventEditor.eventId);
+				printCalendarNames(theResult.participants);
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of the participant you want removed");
 				break;
 //			case "endclock":
@@ -511,6 +511,7 @@ public class UserEditEvent extends SuperUser {
 		
 		return events.get(i);
 	}
+	
 	public int compareDates(Date date1, Date date2){
 		int year1 = date1.getYear()+1900;
 		int month1 = date1.getMonth();
