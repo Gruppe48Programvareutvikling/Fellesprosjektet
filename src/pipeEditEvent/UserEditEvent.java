@@ -249,16 +249,11 @@ public class UserEditEvent extends SuperUser {
 							this.notificationConstructor.message = "You got invited to an event by" + " " + this.eventEditor.creator;
 							this.server.createNotification(this.notificationConstructor);
 							
-							this.eventEditor.privateCalendarName = nextInput + "'s Calendar";
-							ServerResult creator = this.server.createEvent(this.eventEditor);
 							
-							ServerEventsResult gotResult;
-							if(this.eventEditor.roomNumber != 0){
-								gotResult = this.server.getEventIdWithRoom(this.eventEditor);
-							}else{
-								gotResult = this.server.getEventIdWithoutRoom(this.eventEditor);
-							}
-							this.invitationConstructor.id = gotResult.eventId;
+							ServerResult creator = this.server.createPrivateCalendarEvent(nextInput + "'s Calendar", this.eventEditor.eventId);
+							
+							
+							this.invitationConstructor.id = this.eventEditor.eventId;
 							this.invitationConstructor.invitert = new User(nextInput);
 							this.server.createInvitation(this.invitationConstructor);
 							
@@ -278,6 +273,21 @@ public class UserEditEvent extends SuperUser {
 		
 			}
 			break;
+		case ENTER_DELETE:
+			if (nextInput.length() == 0){
+				this.state = State.ENTER_OPTION;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("No deletion was done, enter new action");
+			}
+			if (nextInput.length() <= 45){
+				ServerFindUserResult result = this.server.findUser(nextInput);
+				if(result.userExists){
+					ServerFindUserResult theResult = this.server.isUserInvited(this.eventEditor);
+					if(theResult.userExists){
+						
+					}
+					
+				}
+			}
 		case ENTER_ENDDATE:
 			if (nextInput.length() == 0){
 				if (compareDates(this.eventEditor.startDate, this.eventEditor.endDate) >= 0) {
