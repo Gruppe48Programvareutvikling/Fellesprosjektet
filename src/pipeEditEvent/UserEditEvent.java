@@ -19,7 +19,7 @@ import superClasses.SuperUser;
 
 public class UserEditEvent extends SuperUser {
 	private enum State{ENTER_EVENTID,ENTER_OPTION, ENTER_NAME, ENTER_DESCRIPTION, ENTER_STARTDATE, ENTER_ENDDATE, ENTER_SCLOCK, ENTER_ECLOCK, ENTER_PRIVATE_CALENDAR,
-		ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_NUMBER_OF_SEATS, 
+		ENTER_PRIVATE_CALENDAR_NAME, ENTER_DELETE, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_NUMBER_OF_SEATS, 
 		ENTER_ROOM_NUMBER, ENTER_MORE}
 	State state = State.ENTER_EVENTID;
 	private ArrayList<Integer> possibleRoomNumber = new ArrayList<Integer>();
@@ -92,10 +92,11 @@ public class UserEditEvent extends SuperUser {
 				printCalendarNames(result.privateCalendarNames);
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of one of your private calendars");
 				break;
-//			case "startclock":
-//				this.state = State.ENTER_SCLOCK;
-//				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter new start time hh/mm");
-//				break;
+			case "delete":
+				this.state = State.ENTER_DELETE;
+				
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of the participant you want removed");
+				break;
 //			case "endclock":
 //				this.state = State.ENTER_ENDDATE;
 //				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter new end time hh/mm");

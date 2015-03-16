@@ -30,6 +30,7 @@ public class ServerEditEvent extends ServerEvents {
 	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND ((? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate)) )";
 	private final String SQL_FIND_USER = "Select userName from User where userName =?";
 	private final String SQL_ISINVITED = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
+	private final String SQL_LIST_OF_PARTICIPANTS = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
 	private final String SQL_FIND_EVENTIDLIST = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?";
 	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?,?)";
 	private final String SQL_CREATE_NOTIFICATION = "INSERT INTO Notification(date,message,userName) VALUES (?,?,?)";
@@ -276,6 +277,7 @@ public class ServerEditEvent extends ServerEvents {
 			statement.setString(5, event.location);
 			statement.setString(6, event.creator);
 			statement.setInt(7, event.roomNumber);
+			statement.setString(10, "userName IS NULL");
 			result = statement.executeQuery();
 			
 			boolean gotResult = false;
@@ -306,6 +308,51 @@ public class ServerEditEvent extends ServerEvents {
 		
 		return theResult;
 	}
+	public ServerFindUserResult Participants(Event event){
+		ServerFindUserResult theResult = new ServerFindUserResult();
+		ResultSet result = null;
+		try(
+			Connection connection = this.getDataBaseConnection();
+			PreparedStatement statement = connection.prepareStatement(SQL_LIST_OF_PARTICIPANTS, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		){
+			statement.setString(1, event.name);
+			statement.setString(2, event.description);
+			statement.setString(3, dateToString(event.startDate));
+			statement.setString(4, dateToString(event.endDate));
+			statement.setString(6, event.location);
+			statement.setString(7, event.creator);
+			statement.setInt(8, event.roomNumber);
+			result = statement.executeQuery();
+			
+			boolean gotResult = false;
+			while (result.next()) {
+				gotResult = true;
+				theResult.userName = result.getString(1);
+				theResult.userExists = true;
+				theResult.didSucceed = true;
+					
+				
+			
+			} 
+			
+			if (gotResult == false) {
+				theResult.userExists = false;
+				theResult.didSucceed = true;
+			}
+		} catch (SQLException e) {
+			System.out.println("Got exception");
+			ServerManager.processSQLException(e);
+			
+			theResult.userExists = false;
+			theResult.didSucceed = false;
+			theResult.errorMessage = e.getMessage();
+		}
+		
+	
+		
+		return theResult;
+	}
+	
 	public ServerResult createEvent(Event eventToCreate){
 		ServerResult result = new ServerResult();
 		try(

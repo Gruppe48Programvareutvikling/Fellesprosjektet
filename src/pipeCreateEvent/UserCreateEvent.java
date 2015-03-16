@@ -8,6 +8,16 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+
+>>>>>>> master
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
@@ -209,7 +219,7 @@ public class UserCreateEvent extends SuperUser {
 							Date test = this.eventConstructor.endDate;
 							test.setHours(hour);
 							test.setMinutes(min);
-							if (compareDates(test,this.eventConstructor.startDate)==0 && isTimeAfter(this.eventConstructor.startDate, test)){
+							if ((compareDates(test,this.eventConstructor.startDate)==0 && isTimeAfter(this.eventConstructor.startDate, test)) || compareDates(test,this.eventConstructor.startDate)==0){
 							
 								this.eventConstructor.endDate.setHours(hour);
 								this.eventConstructor.endDate.setMinutes(min);
@@ -250,6 +260,7 @@ public class UserCreateEvent extends SuperUser {
 					}
 					
 					this.state = State.ADD_MORE;
+					this.eventConstructor.groupCalendarName = null;
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of additional the participant");
 				}
 			}else{
@@ -429,41 +440,29 @@ public class UserCreateEvent extends SuperUser {
 			this.notificationConstructor.username = groupUsers.get(i).username;
 			this.server.createNotification(notificationConstructor);
 		}
+		
+		this.eventConstructor.eventId = this.server.createEvent(this.eventConstructor).eventId;
+		
 		for (int i = 0; i < participants.size(); i++) {
 			this.eventConstructor.privateCalendarName = privateCalendarNames.get(i);
 			this.eventConstructor.groupCalendarName = this.groupCalendarName;
-			this.server.createEvent(this.eventConstructor);
-		}
-		for (int i = 0; i < groupUsers.size(); i++) {
-			this.eventConstructor.privateCalendarName = this.groupUserPrivateCalendarNames.get(i); //
-			this.eventConstructor.groupCalendarName = this.groupCalendarName;
-			this.server.createEvent(this.eventConstructor);
-			
+			this.server.createPrivateCalendarEvent(participants.get(i).username, this.eventConstructor.eventId); //create privateCalendarevent
 		}
 		
-		this.eventConstructor.creator = User.currentUser().username;
-		ServerEventsResult result;
-		for (int i = 1; i < participants.size(); i++) {
-			this.eventConstructor.privateCalendarName = participants.get(i).username + "'s Calendar";
-			if(this.eventConstructor.roomNumber != -1){
-				result = this.server.getEventIdWithRoom(this.eventConstructor);
-			}else{
-				result = this.server.getEventIdWithoutRoom(this.eventConstructor);
-			}
 			
-			this.invitationConstructor.id = result.eventId;
+		
+		
+		this.eventConstructor.creator = User.currentUser().username;
+		
+		for (int i = 1; i < participants.size(); i++) {
+						
+			this.invitationConstructor.id = this.eventConstructor.eventId;
 			this.invitationConstructor.invitert = participants.get(i);
 			this.server.createInvitation(this.invitationConstructor);
 		}
 		for (int i = 0; i < groupUsers.size(); i++) {
-			this.eventConstructor.privateCalendarName = groupUsers.get(i).username + "'s Calendar";
-			if (this.eventConstructor.roomNumber != -1){
-				result = this.server.getEventIdWithRoom(this.eventConstructor);
-			}else{
-				result = this.server.getEventIdWithoutRoom(this.eventConstructor);
-			}
 			
-			this.invitationConstructor.id = result.eventId;
+			this.invitationConstructor.id = this.eventConstructor.eventId;
 			this.invitationConstructor.invitert = groupUsers.get(i);
 			this.server.createInvitation(this.invitationConstructor);
 		}

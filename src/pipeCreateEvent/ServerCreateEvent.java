@@ -3,13 +3,25 @@ package pipeCreateEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Date;
 
+<<<<<<< HEAD
+=======
+
+
+
+import com.mysql.jdbc.Statement;
+
+import pipeEditEvent.ServerEditEvent;
+import javafx.scene.transform.Affine;
+>>>>>>> master
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
 import dataStructures.User;
+import serverReturnTypes.ServerCreateEventResult;
 import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
@@ -25,13 +37,14 @@ public class ServerCreateEvent extends ServerManager {
 	private final String SQL_FIND_GROUPS_FROM_USERNAME = "Select groupName from GroupUsers where userName =?";
 	private final String SQL_FIND_GROUP_USERS_FROM_GROUP = "Select userName from GroupUsers where groupName=? and userName !=?";
 	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND (? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate) )";
-	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?,?)";
+	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, description, startDate, endDate, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?)";
 	private final String SQL_FIND_GROUP_CALENDAR_NAME = "SELECT groupCalendarName FROM GroupCalendar WHERE groupName =?";
 	private final String SQL_CREATE_INVITATION = "INSERT INTO InvitesToEvent(userName,eventId,status) VALUES (?,?,?)";
 	private final String SQL_CREATE_NOTIFICATION = "INSERT INTO Notification(date,message,userName) VALUES (?,?,?)";
 	private final String SQL_FIND_NOTIFICATIONID = "Select invitationId from Invitation where userName =?";
 	private final String SQL_FIND_EVENTID = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND privateCalendarName=? AND groupCalendarName =? AND location =? AND userName=? AND roomNumber=?";
 	private final String SQL_FIND_EVENTID_WITHOUT_ROOM = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND privateCalendarName=? AND groupCalendarName =? AND location =? AND userName=? AND roomNumber IS NULL";
+	private final String SQL_CREATE_PRIVATE_CALENDAR_EVENT = "INSERT INTO PrivateCalendarEvent(privateCalendarName, eventId) VALUES (?,?)";
 	
 	public ServerFindGroupResult getListOfGroupsTheUserIsPartOf(String userName){
 		ServerFindGroupResult theResult = new ServerFindGroupResult();
@@ -222,11 +235,12 @@ public class ServerCreateEvent extends ServerManager {
 			
 		return theResult;
 	}
-	public ServerResult createEvent(Event eventToCreate){
-		ServerResult result = new ServerResult();
+	public ServerCreateEventResult createEvent(Event eventToCreate){
+		ServerCreateEventResult result = new ServerCreateEventResult();
+		ResultSet theResult = null;
 		try(
 				Connection connection = this.getDataBaseConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_CREATE_EVENT, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
+				PreparedStatement statement = connection.prepareStatement(SQL_CREATE_EVENT, Statement.RETURN_GENERATED_KEYS)
 			){
 			//for (int i = 0; i < eventToCreate.participants.size(); i++) {
 				
@@ -236,19 +250,33 @@ public class ServerCreateEvent extends ServerManager {
 				statement.setString(2, eventToCreate.description);
 				statement.setString(3, dateToString(eventToCreate.startDate));
 				statement.setString(4, dateToString(eventToCreate.endDate));
+<<<<<<< HEAD
 				statement.setString(5, eventToCreate.privateCalendarName); //maa finne privat navn
 				statement.setString(6, eventToCreate.groupCalendarName);
 				statement.setString(7, eventToCreate.location);
 				statement.setString(8, User.currentUser().username);
+=======
+				
+				statement.setString(5, eventToCreate.groupCalendarName);
+				statement.setString(6, eventToCreate.location);
+				statement.setString(7, User.currentUser().username);
+>>>>>>> master
 				if(eventToCreate.roomNumber != 0){
-					statement.setInt(9, eventToCreate.roomNumber);
+					statement.setInt(8, eventToCreate.roomNumber);
 				}else{
-					statement.setNull(9, java.sql.Types.INTEGER);
+					statement.setNull(8, java.sql.Types.INTEGER);
 				}
 				int affected = statement.executeUpdate();
 				
 				if (affected == 1){
 					result.didSucceed = true;
+					theResult = statement.getGeneratedKeys();
+					ResultSetMetaData rsmd = theResult.getMetaData();
+					System.out.println("COLUMN_COUNT" + rsmd.getColumnCount());
+					while(theResult.next()){
+						result.eventId = theResult.getInt(1);
+						
+					}
 						
 				}
 				else{
@@ -282,87 +310,7 @@ public class ServerCreateEvent extends ServerManager {
 		}
 			return result;
 	}
-	public ServerEventsResult getEventIdWithRoom(Event event){
-		ServerEventsResult theResult = new ServerEventsResult();
-		ResultSet result = null;
-		try(
-				Connection connection = this.getDataBaseConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_FIND_EVENTID, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
-				){ //name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber
-			statement.setString(1, event.name);
-			statement.setString(2, event.description);
-			statement.setString(3, dateToString(event.startDate));
-			statement.setString(4, dateToString(event.endDate));
-			statement.setString(5, event.privateCalendarName);
-			statement.setString(6, event.groupCalendarName);
-			statement.setString(7, event.location);
-			statement.setString(8, event.creator);
-			statement.setInt(9, event.roomNumber);
-			
-		
-			result = statement.executeQuery();
-			boolean gotResult = false;
-			while(result.next()){
-				gotResult = true;
-				theResult.eventId = result.getInt(1);
-				theResult.didSucceed = true;
-				
-			}
-			if (gotResult ==false){
-				theResult.didSucceed = true;
-				theResult.errorMessage = "No eventId was found";
-				
-			}
-			
-		}catch (SQLException e) {
-			// TODO: handle exception
-			ServerCreateEvent.processSQLException(e);
-			theResult.didSucceed = false;
-			theResult.errorMessage = e.getMessage();
-		}
-		return theResult;
-	}
-	public ServerEventsResult getEventIdWithoutRoom(Event event){
-		ServerEventsResult theResult = new ServerEventsResult();
-		ResultSet result = null;
-		try(
-				Connection connection = this.getDataBaseConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_FIND_EVENTID_WITHOUT_ROOM, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
-				){ //name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber
-			statement.setString(1, event.name);
-			statement.setString(2, event.description);
-			statement.setString(3, dateToString(event.startDate));
-			statement.setString(4, dateToString(event.endDate));
-			statement.setString(5, event.privateCalendarName);
-			statement.setString(6, event.groupCalendarName);
-			statement.setString(7, event.location);
-			statement.setString(8, event.creator);
-			
-			
-		
-			result = statement.executeQuery();
-			boolean gotResult = false;
-			while(result.next()){
-				gotResult = true;
-				theResult.eventId = result.getInt(1);
-				theResult.didSucceed = true;
-				
-			}
-			if (gotResult ==false){
-				theResult.didSucceed = true;
-				theResult.errorMessage = "No eventId was found";
-				
-			}
-			
-		}catch (SQLException e) {
-			// TODO: handle exception
-			ServerCreateEvent.processSQLException(e);
-			theResult.didSucceed = false;
-			theResult.errorMessage = e.getMessage();
-		}
-		return theResult;
-	}
-	
+
 	public ServerResult createNotification(Notification notification){
 		ServerResult result = new ServerResult();
 		try(
@@ -389,8 +337,31 @@ public class ServerCreateEvent extends ServerManager {
 		
 		return result;
 	}
-
-	
+	public ServerResult createPrivateCalendarEvent(String userName, int eventId){
+		ServerResult result = new ServerResult();
+		try(
+				Connection connection = this.getDataBaseConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_CREATE_PRIVATE_CALENDAR_EVENT, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
+				){
+				statement.setString(1, userName + "'s Calendar");
+				statement.setInt(2, eventId);
+				int affected = statement.executeUpdate();
+				if (affected == 1){
+					result.didSucceed = true;
+				}else{
+					result.didSucceed = false;
+					result.errorMessage = "Unknow error while creating privateCalendarEvent";
+				}
+		}catch (SQLException e) {
+			// TODO: handle exception
+			ServerCreateEvent.processSQLException(e);
+			result.didSucceed = false;
+			result.errorMessage = e.getMessage();
+		}
+		
+		
+		return result;
+	}
 	
 	public ServerNotificationsResult createInvitation(Invitation invitationToCreate){
 		ServerNotificationsResult result = new ServerNotificationsResult();
