@@ -2,6 +2,8 @@ package mainControlStructure;
 
 import java.util.Scanner;
 
+import adminPipeDeleteGroup.AdminDeleteGroup;
+import adminPipeDeleteUser.AdminDeleteUser;
 import dataStructures.User;
 import pipeCheckAvailability.UserCheckAvailability;
 import pipeCheckRSVPStatusForEvents.UserCheckRSVPStatusForEvents;
@@ -20,25 +22,29 @@ import pipeSeeInvitations.UserSeeInvitations;
 public class Controller implements ControllerInterface {
 	
 	// All of these should be in lowercase
-	public static final String COMMAND_CREATE_USER 						= "create user";
-	public static final String COMMAND_CREATE_CALENDAR 					= "create calendar";
+	public static final String COMMAND_CREATE_USER 							= "create user";
+	public static final String COMMAND_CREATE_CALENDAR 						= "create calendar";
 	public static final String COMMAND_CHECK_AVAILABILITY 					= "check availability";
-	public static final String COMMAND_CREATE_EVENT						= "create event";
+	public static final String COMMAND_CREATE_EVENT							= "create event";
 	public static final String COMMAND_SEE_INVITATIONS						= "see invitations";
 	public static final String COMMAND_LOGIN								= "login";
-	public static final String COMMAND_CREATE_GROUP						= "create group";
+	public static final String COMMAND_CREATE_GROUP							= "create group";
 	public static final String COMMAND_EDIT_EVENT							= "edit event";
-	public static final String COMMAND_CHECK_RSVP_STATUS_FOR_EVENTS		= "check rsvp status for events";
+	public static final String COMMAND_CHECK_RSVP_STATUS_FOR_EVENTS			= "check rsvp status for events";
 	public static final String COMMAND_EVENTS_FOR_THE_DAY					= "events for the day";
 	public static final String COMMAND_GET_NOTIFICATIONS					= "see notifications";
-	public static final String COMMAND_RESPOND_TO_DISTRIBUTED_INVITATIONS  = "respond to distributed invitations";
+	public static final String COMMAND_RESPOND_TO_DISTRIBUTED_INVITATIONS  	= "respond to distributed invitations";
+	
+	public static final String ADMIN_COMMAND_DELETE_USER					= "delete user";
+	public static final String ADMIN_COMMAND_DELETE_GROUP					= "delete group";
 	
 	public static final String COMMAND_LOGOUT								= "logout";
-	public static final String COMMAND_HELP								= "help";
+	public static final String COMMAND_HELP									= "help";
 	
 	
 	
 	private boolean userIsLoggedIn = false;
+	private boolean currentUserIsAdmin = false;
 	private DelegateInterface delegate = null;
 	private Scanner inputScanner = new Scanner(System.in);
 	
@@ -66,9 +72,12 @@ public class Controller implements ControllerInterface {
 	
 	public void delegateDidLogInUser(String username) {
 		this.userIsLoggedIn = true;
+		if (username.equals("admin")) {
+			this.currentUserIsAdmin = true;
+		}
 		User.currentUser().username = username;
 		System.out.println("You are logged in as \"" + username + "\"");
-		}
+	}
 	
 	public void delegateIsWaitingForServerWithMessage(String message) {
 		System.out.println(message);
@@ -93,9 +102,24 @@ public class Controller implements ControllerInterface {
 			// nextInput is not going to be used for anything other than to check against valid commands.
 			// That will be easier to do if everything is lowercase.
 			nextInput = nextInput.toLowerCase();
-			
 			if (this.userIsLoggedIn) {
 				switch (nextInput) {
+				case ADMIN_COMMAND_DELETE_USER:
+					if (this.currentUserIsAdmin == true) {
+						this.delegate = new AdminDeleteUser(this);
+					} else {
+						System.out.println("You are not an admin.");
+						this.mainLoopWithPrompt(null);
+					}
+					break;
+				case ADMIN_COMMAND_DELETE_GROUP:
+					if (this.currentUserIsAdmin == true) {
+						this.delegate = new AdminDeleteGroup(this);
+					} else {
+						System.out.println("You are not an admin");
+						this.mainLoopWithPrompt(null);
+					}
+					break;
 				case COMMAND_CHECK_AVAILABILITY:
 					this.delegate = new UserCheckAvailability(this);
 					break;
@@ -128,6 +152,7 @@ public class Controller implements ControllerInterface {
 					break;
 				case COMMAND_LOGOUT:
 					this.userIsLoggedIn = false;
+					this.currentUserIsAdmin = false;
 					User.currentUser().username = null;
 					System.out.println("You have successfully logged out");
 					this.mainLoopWithPrompt(null);
@@ -173,6 +198,10 @@ public class Controller implements ControllerInterface {
 			String currentOptions = "You currently have the following options:\n";
 			
 			if (this.userIsLoggedIn) {
+				if (this.currentUserIsAdmin) {
+					currentOptions += "- " + ADMIN_COMMAND_DELETE_USER + "\n";
+					currentOptions += "- " + ADMIN_COMMAND_DELETE_GROUP + "\n";
+				}
 				currentOptions += "- " + COMMAND_CHECK_AVAILABILITY + "\n";
 				currentOptions += "- " + COMMAND_CREATE_EVENT + "\n";
 				currentOptions += "- " + COMMAND_CREATE_CALENDAR + "\n";
