@@ -266,7 +266,7 @@ public class ServerCreateEvent extends ServerManager {
 					result.didSucceed = true;
 					theResult = statement.getGeneratedKeys();
 					ResultSetMetaData rsmd = theResult.getMetaData();
-					System.out.println("COLUMN_COUNT" + rsmd.getColumnCount());
+					
 					while(theResult.next()){
 						result.eventId = theResult.getInt(1);
 						
@@ -298,7 +298,7 @@ public class ServerCreateEvent extends ServerManager {
 			//}
 			
 		}catch (SQLException e) {
-			if()
+			
 			ServerCreateEvent.processSQLException(e);
 			result.didSucceed = false;
 			result.errorMessage = e.getMessage();

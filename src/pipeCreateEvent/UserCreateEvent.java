@@ -303,6 +303,7 @@ public class UserCreateEvent extends SuperUser {
 					this.eventConstructor.roomNumber = 0;
 					createEvent();
 				}
+					Integer.parseInt(nextInput);
 					ServerRoomResult result = this.server.findRoomResult(nextInput, this.eventConstructor.startDate, this.eventConstructor.endDate);
 					if (result.didSucceed == true){	
 						if (result.roomIsAvailable){	
@@ -323,6 +324,8 @@ public class UserCreateEvent extends SuperUser {
 				}catch (NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Must write a number");
 				}
+			}else{
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Input was too long, try again");
 			}
 			break;
 		case ENTER_ROOM_NUMBER:
