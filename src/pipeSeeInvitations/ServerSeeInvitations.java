@@ -81,7 +81,6 @@ public class ServerSeeInvitations extends ServerManager {
 					theResult.didSucceed = false;
 					theResult.errorMessage = e.getMessage();
 				}
-		
 		return theResult;
 	}
 }

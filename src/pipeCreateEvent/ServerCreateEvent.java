@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
-import pipeEditEvent.ServerEditEvent;
-import javafx.scene.transform.Affine;
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
@@ -18,7 +16,6 @@ import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
 import serverReturnTypes.ServerNotificationsResult;
 import serverReturnTypes.ServerRoomResult;
-import superClasses.ServerEvents;
 import superClasses.ServerManager;
 import superClasses.ServerResult;
 
@@ -239,7 +236,7 @@ public class ServerCreateEvent extends ServerManager {
 				statement.setString(2, eventToCreate.description);
 				statement.setString(3, dateToString(eventToCreate.startDate));
 				statement.setString(4, dateToString(eventToCreate.endDate));
-				statement.setString(5, eventToCreate.privateCalendarName); //må finne privat navn
+				statement.setString(5, eventToCreate.privateCalendarName); //maa finne privat navn
 				statement.setString(6, eventToCreate.groupCalendarName);
 				statement.setString(7, eventToCreate.location);
 				statement.setString(8, User.currentUser().username);
@@ -263,7 +260,7 @@ public class ServerCreateEvent extends ServerManager {
 //				
 //				
 //
-//				statement.setString(5, null); //må finne privat navn
+//				statement.setString(5, null); //maa finne privat navn
 //				statement.setString(6, eventToCreate.groupCalendarName);
 //				
 //				int affected = statement.executeUpdate();
@@ -433,5 +430,5 @@ public class ServerCreateEvent extends ServerManager {
 		return string;
 	}
 }//
-//må gi calendarName
+//maa gi calendarName
 //lage notifications og invitations

@@ -1,9 +1,6 @@
 package pipeCreateEvent;
 
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -11,26 +8,16 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 
-
-
-
-
-
-
-
-import javafx.scene.web.PromptData;
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerCalendarResult;
 import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
 import serverReturnTypes.ServerRoomResult;
-import superClasses.ServerResult;
 import superClasses.SuperUser;
 
 public class UserCreateEvent extends SuperUser {
@@ -136,7 +123,7 @@ public class UserCreateEvent extends SuperUser {
 			break;
 			
 		case ENTER_SCLOCK:
-			String[] sTime = nextInput.split("\\."); //må lage test
+			String[] sTime = nextInput.split("\\."); //maa lage test
 			
 				
 					try{
@@ -342,7 +329,7 @@ public class UserCreateEvent extends SuperUser {
 			
 			if (nextInput.length() <= 11){
 				try{
-						if (this.server.findRoomResult(Integer.toString(possibleRoomNumber), this.eventConstructor.startDate, this.eventConstructor.endDate).roomNumber.contains(Integer.parseInt(nextInput))){ //må endres
+						if (this.server.findRoomResult(Integer.toString(possibleRoomNumber), this.eventConstructor.startDate, this.eventConstructor.endDate).roomNumber.contains(Integer.parseInt(nextInput))){ //maa endres
 							this.eventConstructor.roomNumber = Integer.parseInt(nextInput);
 							
 							createEvent();
