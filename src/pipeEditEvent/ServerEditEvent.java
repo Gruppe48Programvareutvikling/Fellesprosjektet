@@ -22,7 +22,7 @@ import superClasses.ServerResult;
 
 public class ServerEditEvent extends ServerEvents {
 	
-	private final String SQL_GET_LIST_OF_EVENTS = "Select * FROM Event WHERE userName =? AND privateCalendarName =?";
+	private final String SQL_GET_LIST_OF_EVENTS = "Select * FROM Event WHERE userName =?";
 	
 	private final String SQL_UPDATE_EVENT = "UPDATE Event SET name =?, description =?, startDate =?, endDate =?, privateCalendarName =?,"
 			+ "groupCalendarName =?, location =?, userName=?, roomnumber =? WHERE eventId =?";
@@ -30,13 +30,17 @@ public class ServerEditEvent extends ServerEvents {
 	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND ((? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate)) )";
 	private final String SQL_FIND_USER = "Select userName from User where userName =?";
 	private final String SQL_ISINVITED = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
-	private final String SQL_LIST_OF_PARTICIPANTS = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
+	//private final String SQL_LIST_OF_PARTICIPANTS = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
+	private final String SQL_LIST_OF_PARTICIPANTS = "SELECT userName FROM PrivateCalendarEvent WHERE eventId =?";
 	private final String SQL_FIND_EVENTIDLIST = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?";
 	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?,?)";
 	private final String SQL_CREATE_NOTIFICATION = "INSERT INTO Notification(date,message,userName) VALUES (?,?,?)";
 	private final String SQL_FIND_EVENTID = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND privateCalendarName=? AND groupCalendarName =? AND location =? AND userName=? AND roomNumber=?";
 	private final String SQL_FIND_EVENTID_WITHOUT_ROOM = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND privateCalendarName=? AND groupCalendarName =? AND location =? AND userName=? AND roomNumber IS NULL";
 	private final String SQL_CREATE_INVITATION = "INSERT INTO InvitesToEvent(userName,eventId,status) VALUES (?,?,?)";
+	private final String SQL_CREATE_PRIVATE_CALENDAR_EVENT = "INSERT INTO PrivateCalendarEvent(privateCalendarName, eventId) VALUES (?,?)";
+	private final String SQL_DELETE_PARTICIPANT = "DELETE FROM PrivateCalendarEvent WHERE privateCalendarName =? AND eventId =?";
+	
 	public ServerEventsResult getListOfEvents(String userName){
 		ServerEventsResult theResult = new ServerEventsResult();
 		ResultSet result = null;
@@ -45,7 +49,6 @@ public class ServerEditEvent extends ServerEvents {
 				PreparedStatement statement = connection.prepareStatement(SQL_GET_LIST_OF_EVENTS, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
 				){
 				statement.setString(1, userName);
-				statement.setString(2, userName + "'s Calendar");
 				result = statement.executeQuery();
 				boolean gotResult = false;
 				
@@ -66,7 +69,7 @@ public class ServerEditEvent extends ServerEvents {
 					eventConstructor.privateCalendarName = result.getString(6);
 					eventConstructor.groupCalendarName = result.getString(7);
 					eventConstructor.location = result.getString(8);
-					eventConstructor.roomNumber = result.getInt(10);
+					eventConstructor.roomNumber = result.getInt(9);
 					theResult.events.add(eventConstructor);
 					
 					
@@ -308,26 +311,20 @@ public class ServerEditEvent extends ServerEvents {
 		
 		return theResult;
 	}
-	public ServerFindUserResult Participants(Event event){
+	public ServerFindUserResult Participants(int eventId){
 		ServerFindUserResult theResult = new ServerFindUserResult();
 		ResultSet result = null;
 		try(
 			Connection connection = this.getDataBaseConnection();
 			PreparedStatement statement = connection.prepareStatement(SQL_LIST_OF_PARTICIPANTS, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		){
-			statement.setString(1, event.name);
-			statement.setString(2, event.description);
-			statement.setString(3, dateToString(event.startDate));
-			statement.setString(4, dateToString(event.endDate));
-			statement.setString(6, event.location);
-			statement.setString(7, event.creator);
-			statement.setInt(8, event.roomNumber);
+			statement.setInt(1, eventId);
 			result = statement.executeQuery();
 			
 			boolean gotResult = false;
 			while (result.next()) {
 				gotResult = true;
-				theResult.userName = result.getString(1);
+				theResult.participants.add(result.getString(1));
 				theResult.userExists = true;
 				theResult.didSucceed = true;
 					
@@ -393,6 +390,29 @@ public class ServerEditEvent extends ServerEvents {
 		}
 			return result;
 	}
+	public ServerResult createPrivateCalendarEvent(String userName, int eventId){
+		ServerResult result = new ServerResult();
+		try(
+				Connection connection = this.getDataBaseConnection();
+				PreparedStatement statement = connection.prepareStatement(SQL_CREATE_PRIVATE_CALENDAR_EVENT, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
+				){
+				statement.setString(1, userName + "'s Calendar");
+				statement.setInt(2, eventId);
+				int affected = statement.executeUpdate();
+				if (affected == 1){
+					result.didSucceed = true;
+				}else{
+					result.didSucceed = false;
+					result.errorMessage = "Unknow error while creating privateCalendarEvent";
+				}
+		}catch (SQLException e) {
+			// TODO: handle exception
+			ServerCreateEvent.processSQLException(e);
+			result.didSucceed = false;
+			result.errorMessage = e.getMessage();
+		}
+		return result;
+	}
 	public ServerResult createNotification(Notification notification){
 		ServerResult result = new ServerResult();
 		try(
@@ -419,86 +439,32 @@ public class ServerEditEvent extends ServerEvents {
 		
 		return result;
 	}
-	public ServerEventsResult getEventIdWithRoom(Event event){
-		ServerEventsResult theResult = new ServerEventsResult();
-		ResultSet result = null;
+	public ServerResult deleteParticipant(String privateCalendarName, int eventId){
+		ServerResult result = new ServerResult();
 		try(
 				Connection connection = this.getDataBaseConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_FIND_EVENTID, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
-				){ //name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber
-			statement.setString(1, event.name);
-			statement.setString(2, event.description);
-			statement.setString(3, dateToString(event.startDate));
-			statement.setString(4, dateToString(event.endDate));
-			statement.setString(5, event.privateCalendarName);
-			statement.setString(6, event.groupCalendarName);
-			statement.setString(7, event.location);
-			statement.setString(8, event.creator);
-			statement.setInt(9, event.roomNumber);
-			
-		
-			result = statement.executeQuery();
-			boolean gotResult = false;
-			while(result.next()){
-				gotResult = true;
-				theResult.eventId = result.getInt(1);
-				theResult.didSucceed = true;
-				
-			}
-			if (gotResult ==false){
-				theResult.didSucceed = true;
-				theResult.errorMessage = "No eventId was found";
-				
-			}
-			
+				PreparedStatement statement = connection.prepareStatement(SQL_DELETE_PARTICIPANT, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
+				){
+				statement.setString(1, privateCalendarName);
+				statement.setInt(2, eventId);
+				int affected = statement.executeUpdate();
+				if (affected == 1){
+					result.didSucceed = true;
+				}else{
+					result.didSucceed = false;
+					result.errorMessage = "Unknown error while deleting participant";
+					
+				}
 		}catch (SQLException e) {
 			// TODO: handle exception
-			ServerCreateEvent.processSQLException(e);
-			theResult.didSucceed = false;
-			theResult.errorMessage = e.getMessage();
+		ServerCreateEvent.processSQLException(e);
+		result.didSucceed = false;
+		result.errorMessage = e.getMessage();
 		}
-		return theResult;
-	}
-	public ServerEventsResult getEventIdWithoutRoom(Event event){
-		ServerEventsResult theResult = new ServerEventsResult();
-		ResultSet result = null;
-		try(
-				Connection connection = this.getDataBaseConnection();
-				PreparedStatement statement = connection.prepareStatement(SQL_FIND_EVENTID_WITHOUT_ROOM, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)
-				){ //name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber
-			statement.setString(1, event.name);
-			statement.setString(2, event.description);
-			statement.setString(3, dateToString(event.startDate));
-			statement.setString(4, dateToString(event.endDate));
-			statement.setString(5, event.privateCalendarName);
-			statement.setString(6, event.groupCalendarName);
-			statement.setString(7, event.location);
-			statement.setString(8, event.creator);
-			
-			
 		
-			result = statement.executeQuery();
-			boolean gotResult = false;
-			while(result.next()){
-				gotResult = true;
-				theResult.eventId = result.getInt(1);
-				theResult.didSucceed = true;
-				
-			}
-			if (gotResult ==false){
-				theResult.didSucceed = true;
-				theResult.errorMessage = "No eventId was found";
-				
-			}
-			
-		}catch (SQLException e) {
-			// TODO: handle exception
-			ServerCreateEvent.processSQLException(e);
-			theResult.didSucceed = false;
-			theResult.errorMessage = e.getMessage();
-		}
-		return theResult;
+		return result;
 	}
+	
 	public ServerNotificationsResult createInvitation(Invitation invitationToCreate){
 		ServerNotificationsResult result = new ServerNotificationsResult();
 		try (

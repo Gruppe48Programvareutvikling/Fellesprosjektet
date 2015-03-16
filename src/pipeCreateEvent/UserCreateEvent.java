@@ -303,6 +303,7 @@ public class UserCreateEvent extends SuperUser {
 					this.eventConstructor.roomNumber = 0;
 					createEvent();
 				}
+					Integer.parseInt(nextInput);
 					ServerRoomResult result = this.server.findRoomResult(nextInput, this.eventConstructor.startDate, this.eventConstructor.endDate);
 					if (result.didSucceed == true){	
 						if (result.roomIsAvailable){	
@@ -323,6 +324,8 @@ public class UserCreateEvent extends SuperUser {
 				}catch (NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Must write a number");
 				}
+			}else{
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Input was too long, try again");
 			}
 			break;
 		case ENTER_ROOM_NUMBER:
@@ -442,18 +445,22 @@ public class UserCreateEvent extends SuperUser {
 		
 		
 		this.eventConstructor.creator = User.currentUser().username;
+		this.invitationConstructor.id = this.eventConstructor.eventId;
 		
+		this.invitationConstructor.invitert = participants.get(0);
+		this.server.createInvitation(this.invitationConstructor, "ACCEPT");
+	
 		for (int i = 1; i < participants.size(); i++) {
 						
-			this.invitationConstructor.id = this.eventConstructor.eventId;
+			
 			this.invitationConstructor.invitert = participants.get(i);
-			this.server.createInvitation(this.invitationConstructor);
+			this.server.createInvitation(this.invitationConstructor, "MAYBE");
 		}
 		for (int i = 0; i < groupUsers.size(); i++) {
 			
-			this.invitationConstructor.id = this.eventConstructor.eventId;
+			
 			this.invitationConstructor.invitert = groupUsers.get(i);
-			this.server.createInvitation(this.invitationConstructor);
+			this.server.createInvitation(this.invitationConstructor, "MAYBE");
 		}
 		
 		this.delegator.delegateIsDone("Event has been created");
