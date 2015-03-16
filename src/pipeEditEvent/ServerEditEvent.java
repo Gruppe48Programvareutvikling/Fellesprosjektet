@@ -22,7 +22,7 @@ import superClasses.ServerResult;
 
 public class ServerEditEvent extends ServerEvents {
 	
-	private final String SQL_GET_LIST_OF_EVENTS = "Select * FROM Event WHERE userName =? AND privateCalendarName =?";
+	private final String SQL_GET_LIST_OF_EVENTS = "Select * FROM Event WHERE userName =?";
 	
 	private final String SQL_UPDATE_EVENT = "UPDATE Event SET name =?, description =?, startDate =?, endDate =?, privateCalendarName =?,"
 			+ "groupCalendarName =?, location =?, userName=?, roomnumber =? WHERE eventId =?";
@@ -45,7 +45,6 @@ public class ServerEditEvent extends ServerEvents {
 				PreparedStatement statement = connection.prepareStatement(SQL_GET_LIST_OF_EVENTS, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
 				){
 				statement.setString(1, userName);
-				statement.setString(2, userName + "'s Calendar");
 				result = statement.executeQuery();
 				boolean gotResult = false;
 				

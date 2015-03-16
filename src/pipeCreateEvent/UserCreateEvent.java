@@ -442,18 +442,22 @@ public class UserCreateEvent extends SuperUser {
 		
 		
 		this.eventConstructor.creator = User.currentUser().username;
+		this.invitationConstructor.id = this.eventConstructor.eventId;
 		
+		this.invitationConstructor.invitert = participants.get(0);
+		this.server.createInvitation(this.invitationConstructor, "ACCEPT");
+	
 		for (int i = 1; i < participants.size(); i++) {
 						
-			this.invitationConstructor.id = this.eventConstructor.eventId;
+			
 			this.invitationConstructor.invitert = participants.get(i);
-			this.server.createInvitation(this.invitationConstructor);
+			this.server.createInvitation(this.invitationConstructor, "MAYBE");
 		}
 		for (int i = 0; i < groupUsers.size(); i++) {
 			
-			this.invitationConstructor.id = this.eventConstructor.eventId;
+			
 			this.invitationConstructor.invitert = groupUsers.get(i);
-			this.server.createInvitation(this.invitationConstructor);
+			this.server.createInvitation(this.invitationConstructor, "MAYBE");
 		}
 		
 		this.delegator.delegateIsDone("Event has been created");
