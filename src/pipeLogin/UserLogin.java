@@ -56,6 +56,10 @@ public class UserLogin extends SuperUser {
 				this.delegator.delegateIsDone("There was an error logging in with the message \"" + availability.errorMessage + "\"");
 			}
 			break;
+		default:
+			
+			this.delegator.delegateIsDone("Something went wrong with the states");
+			
 		}
 	}
 	
