@@ -18,19 +18,16 @@ import java.util.List;
 
 
 
-import javafx.scene.web.PromptData;
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerCalendarResult;
 import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
 import serverReturnTypes.ServerRoomResult;
-import superClasses.ServerResult;
 import superClasses.SuperUser;
 
 public class UserCreateEvent extends SuperUser {
@@ -222,7 +219,7 @@ public class UserCreateEvent extends SuperUser {
 							Date test = this.eventConstructor.endDate;
 							test.setHours(hour);
 							test.setMinutes(min);
-							if (compareDates(test,this.eventConstructor.startDate)==0 && isTimeAfter(this.eventConstructor.startDate, test)){
+							if ((compareDates(test,this.eventConstructor.startDate)==0 && isTimeAfter(this.eventConstructor.startDate, test)) || compareDates(test,this.eventConstructor.startDate)==0){
 							
 								this.eventConstructor.endDate.setHours(hour);
 								this.eventConstructor.endDate.setMinutes(min);
