@@ -39,7 +39,7 @@ public class ServerEditEvent extends ServerEvents {
 	private final String SQL_FIND_EVENTID_WITHOUT_ROOM = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND privateCalendarName=? AND groupCalendarName =? AND location =? AND userName=? AND roomNumber IS NULL";
 	private final String SQL_CREATE_INVITATION = "INSERT INTO InvitesToEvent(userName,eventId,status) VALUES (?,?,?)";
 	private final String SQL_CREATE_PRIVATE_CALENDAR_EVENT = "INSERT INTO PrivateCalendarEvent(privateCalendarName, eventId) VALUES (?,?)";
-	private final String SQL_DELETE_PARTICIPANT = "DELETE FROM PrivateCalendarEvent WHERE privateCalendarName =? AND eventId =?";
+	private final String SQL_DELETE_PARTICIPANT = "DELETE FROM PrivateCalendarEvent WHERE eventId = ? AND privateCalendarName IN (Select p1.privateCalendarName From PrivateCalendar p1 Where userName = ?)";
 	
 	public ServerEventsResult getListOfEvents(String userName){
 		ServerEventsResult theResult = new ServerEventsResult();
@@ -439,14 +439,14 @@ public class ServerEditEvent extends ServerEvents {
 		
 		return result;
 	}
-	public ServerResult deleteParticipant(String privateCalendarName, int eventId){
+	public ServerResult deleteParticipant(String userName, int eventId){
 		ServerResult result = new ServerResult();
 		try(
 				Connection connection = this.getDataBaseConnection();
 				PreparedStatement statement = connection.prepareStatement(SQL_DELETE_PARTICIPANT, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
 				){
-				statement.setString(1, privateCalendarName);
-				statement.setInt(2, eventId);
+				statement.setString(2, userName);
+				statement.setInt(1, eventId);
 				int affected = statement.executeUpdate();
 				if (affected == 1){
 					result.didSucceed = true;

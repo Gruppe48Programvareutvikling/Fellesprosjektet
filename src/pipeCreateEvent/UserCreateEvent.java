@@ -12,7 +12,6 @@ import dataStructures.Invitation;
 import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
@@ -230,8 +229,12 @@ public class UserCreateEvent extends SuperUser {
 				this.eventConstructor.location = nextInput;
 				this.state = State.ENTER_GROUP_NAME;
 				ServerFindGroupResult result = this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username);
-				System.out.println(result.groupNames); //printe ut, har ikke laget toString
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
+				System.out.println(result.groupNames); 
+				if (result.groupNames.size() == 0){
+					this.state = State.ADD_MORE;
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants? Y/N");
+				}
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
 				
 				
 			}else {
@@ -250,7 +253,7 @@ public class UserCreateEvent extends SuperUser {
 					
 					this.state = State.ADD_MORE;
 					this.eventConstructor.groupCalendarName = null;
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of additional the participant");
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants? Y/N");
 				}
 			}else{
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of the group was too long, try again");

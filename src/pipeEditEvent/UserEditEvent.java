@@ -283,11 +283,15 @@ public class UserEditEvent extends SuperUser {
 				if(result.userExists){
 					ServerFindUserResult theResult = this.server.isUserInvited(this.eventEditor);
 					if(theResult.userExists){
-						
+						ServerResult gotResult = server.deleteParticipant(nextInput, this.eventEditor.eventId);
+						if (gotResult.didSucceed == true) {
+							
+						}
 					}
 					
 				}
 			}
+			break;
 		case ENTER_ENDDATE:
 			if (nextInput.length() == 0){
 				if (compareDates(this.eventEditor.startDate, this.eventEditor.endDate) >= 0) {
@@ -553,6 +557,8 @@ public class UserEditEvent extends SuperUser {
 	}
 	
 	public void userAsksForHelp() {
+		switch(this.state){
 		
+		}
 	}
 }
