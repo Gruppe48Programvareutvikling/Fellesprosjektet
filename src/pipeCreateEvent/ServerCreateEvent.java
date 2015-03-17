@@ -245,15 +245,11 @@ public class ServerCreateEvent extends ServerManager {
 				statement.setString(2, eventToCreate.description);
 				statement.setString(3, dateToString(eventToCreate.startDate));
 				statement.setString(4, dateToString(eventToCreate.endDate));
-				statement.setString(5, eventToCreate.privateCalendarName); //maa finne privat navn
-				statement.setString(6, eventToCreate.groupCalendarName);
-				statement.setString(7, eventToCreate.location);
-				statement.setString(8, User.currentUser().username);
-
-				
+				 //maa finne privat navn
 				statement.setString(5, eventToCreate.groupCalendarName);
 				statement.setString(6, eventToCreate.location);
 				statement.setString(7, User.currentUser().username);
+
 
 				if(eventToCreate.roomNumber != 0){
 					statement.setInt(8, eventToCreate.roomNumber);
