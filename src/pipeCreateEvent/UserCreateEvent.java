@@ -87,6 +87,9 @@ public class UserCreateEvent extends SuperUser {
 			String sDay = date[0];
 			String sMonth = date[1];
 			String sYear = date[2];
+			if (sDay.length() != 2 || sMonth.length() != 2 || sYear.length() != 4 ){
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Wrong format. Please try again. dd/mm/yyyy");
+			}
 		
 			
 			try{
@@ -159,7 +162,9 @@ public class UserCreateEvent extends SuperUser {
 			String sEDay = eDate[0];
 			String sEMonth = eDate[1];
 			String sEYear = eDate[2];
-		
+			if (sEDay.length() != 2 || sEMonth.length() != 2 || sEYear.length() != 4 ){
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Wrong format. Please try again. dd/mm/yyyy");
+			}
 			
 			try{
 				int day = Integer.parseInt(sEDay);
