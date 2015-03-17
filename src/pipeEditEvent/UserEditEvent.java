@@ -557,6 +557,8 @@ public class UserEditEvent extends SuperUser {
 	}
 	
 	public void userAsksForHelp() {
+		switch(this.state){
 		
+		}
 	}
 }
