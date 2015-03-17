@@ -275,7 +275,7 @@ public class UserCreateEvent extends SuperUser {
 							this.state = State.ADD_MORE;
 							this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants Y/N?");
 						}
-						this.state = state.ADD_MORE;
+						this.state = State.ADD_MORE;
 						this.delegator.delegateIsReadyForNextInputWithPrompt("This user is already invited, want to try again? Y/N");
 					}else{
 						this.state = State.ADD_MORE;
