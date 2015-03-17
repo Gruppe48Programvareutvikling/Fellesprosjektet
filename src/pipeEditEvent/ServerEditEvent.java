@@ -24,7 +24,7 @@ public class ServerEditEvent extends ServerEvents {
 	
 	private final String SQL_GET_LIST_OF_EVENTS = "Select * FROM Event WHERE userName =?";
 	
-	private final String SQL_UPDATE_EVENT = "UPDATE Event SET name =?, description =?, startDate =?, endDate =?, privateCalendarName =?,"
+	private final String SQL_UPDATE_EVENT = "UPDATE Event SET name =?, description =?, startDate =?, endDate =?,"
 			+ "groupCalendarName =?, location =?, userName=?, roomnumber =? WHERE eventId =?";
 	private final String SQL_FIND_PRIVATE_CALENDAR_NAME = "SELECT privateCalendarName FROM PrivateCalendar WHERE userName =?";
 	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND ((? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate)) )";
@@ -66,9 +66,8 @@ public class ServerEditEvent extends ServerEvents {
 					eventConstructor.endDate = result.getTimestamp(5);
 					eventConstructor.endDate.setYear(eventConstructor.endDate.getYear());
 					eventConstructor.endDate.setMonth((eventConstructor.endDate.getMonth()));
-					eventConstructor.privateCalendarName = result.getString(6);
-					eventConstructor.groupCalendarName = result.getString(7);
-					eventConstructor.location = result.getString(8);
+					eventConstructor.groupCalendarName = result.getString(6);
+					eventConstructor.location = result.getString(7);
 					eventConstructor.roomNumber = result.getInt(9);
 					theResult.events.add(eventConstructor);
 					
@@ -98,17 +97,17 @@ public class ServerEditEvent extends ServerEvents {
 				statement.setString(2, eventToCreate.description);
 				statement.setString(3, dateToString(eventToCreate.startDate));
 				statement.setString(4, dateToString(eventToCreate.endDate));
-				statement.setString(5, eventToCreate.privateCalendarName);
-				statement.setString(6, eventToCreate.groupCalendarName);
-				statement.setString(7, eventToCreate.location);
-				statement.setString(8, eventToCreate.creator);
+				
+				statement.setString(5, eventToCreate.groupCalendarName);
+				statement.setString(6, eventToCreate.location);
+				statement.setString(7, eventToCreate.creator);
 				if (eventToCreate.roomNumber == 0){
-					statement.setNull(9, java.sql.Types.INTEGER);
+					statement.setNull(8, java.sql.Types.INTEGER);
 				}else{
-					statement.setInt(9, eventToCreate.roomNumber);
+					statement.setInt(8, eventToCreate.roomNumber);
 				}
 				
-				statement.setInt(10,eventToCreate.eventId);
+				statement.setInt(9,eventToCreate.eventId);
 				int affected = statement.executeUpdate();
 				if (affected == 1){
 					result.didSucceed = true;

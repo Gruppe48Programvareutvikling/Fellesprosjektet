@@ -462,7 +462,8 @@ public class UserEditEvent extends SuperUser {
 						this.eventEditor.roomNumber = num;
 							
 						this.server.editEvent(this.eventEditor);
-							
+						this.state = State.ENTER_OPTION;
+						this.delegator.delegateIsReadyForNextInputWithPrompt("Room number has been changed");	
 							
 							
 							
@@ -486,7 +487,7 @@ public class UserEditEvent extends SuperUser {
 			System.out.println("Description:" + eventsToPrint.get(i).description);
 			System.out.println("Start date:" + eventsToPrint.get(i).startDate.toString());
 			System.out.println("End date:" + eventsToPrint.get(i).endDate.toString());
-			System.out.println("Private calendar name:" + eventsToPrint.get(i).privateCalendarName);
+			
 			System.out.println("Group Calendar Name:" + eventsToPrint.get(i).groupCalendarName);
 			System.out.println("Location:" + eventsToPrint.get(i).location);
 			System.out.println("Creator:" + eventsToPrint.get(i).creator);
