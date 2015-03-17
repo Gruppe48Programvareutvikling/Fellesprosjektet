@@ -12,7 +12,6 @@ import dataStructures.Invitation;
 import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
@@ -230,8 +229,12 @@ public class UserCreateEvent extends SuperUser {
 				this.eventConstructor.location = nextInput;
 				this.state = State.ENTER_GROUP_NAME;
 				ServerFindGroupResult result = this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username);
-				System.out.println(result.groupNames); //printe ut, har ikke laget toString
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
+				System.out.println(result.groupNames); 
+				if (result.groupNames.size() == 0){
+					this.state = State.ADD_MORE;
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants? Y/N");
+				}
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
 				
 				
 			}else {
@@ -250,7 +253,7 @@ public class UserCreateEvent extends SuperUser {
 					
 					this.state = State.ADD_MORE;
 					this.eventConstructor.groupCalendarName = null;
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of additional the participant");
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants? Y/N");
 				}
 			}else{
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of the group was too long, try again");
@@ -272,7 +275,7 @@ public class UserCreateEvent extends SuperUser {
 							this.state = State.ADD_MORE;
 							this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants Y/N?");
 						}
-						this.state = state.ADD_MORE;
+						this.state = State.ADD_MORE;
 						this.delegator.delegateIsReadyForNextInputWithPrompt("This user is already invited, want to try again? Y/N");
 					}else{
 						this.state = State.ADD_MORE;
@@ -303,6 +306,7 @@ public class UserCreateEvent extends SuperUser {
 					this.eventConstructor.roomNumber = 0;
 					createEvent();
 				}
+					Integer.parseInt(nextInput);
 					ServerRoomResult result = this.server.findRoomResult(nextInput, this.eventConstructor.startDate, this.eventConstructor.endDate);
 					if (result.didSucceed == true){	
 						if (result.roomIsAvailable){	
@@ -323,6 +327,8 @@ public class UserCreateEvent extends SuperUser {
 				}catch (NumberFormatException e){
 					this.delegator.delegateIsReadyForNextInputWithPrompt("Must write a number");
 				}
+			}else{
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Input was too long, try again");
 			}
 			break;
 		case ENTER_ROOM_NUMBER:
@@ -442,18 +448,22 @@ public class UserCreateEvent extends SuperUser {
 		
 		
 		this.eventConstructor.creator = User.currentUser().username;
+		this.invitationConstructor.id = this.eventConstructor.eventId;
 		
+		this.invitationConstructor.invitert = participants.get(0);
+		this.server.createInvitation(this.invitationConstructor, "ACCEPT");
+	
 		for (int i = 1; i < participants.size(); i++) {
 						
-			this.invitationConstructor.id = this.eventConstructor.eventId;
+			
 			this.invitationConstructor.invitert = participants.get(i);
-			this.server.createInvitation(this.invitationConstructor);
+			this.server.createInvitation(this.invitationConstructor, "MAYBE");
 		}
 		for (int i = 0; i < groupUsers.size(); i++) {
 			
-			this.invitationConstructor.id = this.eventConstructor.eventId;
+			
 			this.invitationConstructor.invitert = groupUsers.get(i);
-			this.server.createInvitation(this.invitationConstructor);
+			this.server.createInvitation(this.invitationConstructor, "MAYBE");
 		}
 		
 		this.delegator.delegateIsDone("Event has been created");

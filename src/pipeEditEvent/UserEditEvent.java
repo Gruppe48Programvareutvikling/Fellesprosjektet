@@ -57,8 +57,7 @@ public class UserEditEvent extends SuperUser {
 				if (listOfEventId.contains(num)){
 				
 					eventEditor = getEvent( listOfEvents, num);
-					ServerEventsResult result = this.server.getEventIdListWithRoom(this.eventEditor);
-					listOfEventId = result.eventIds;
+					
 					this.state = State.ENTER_OPTION;
 					this.delegator.delegateIsReadyForNextInputWithPrompt("What do you want to edit?");
 				}
@@ -94,7 +93,8 @@ public class UserEditEvent extends SuperUser {
 				break;
 			case "delete":
 				this.state = State.ENTER_DELETE;
-				
+				ServerFindUserResult theResult = this.server.Participants(this.eventEditor.eventId);
+				printCalendarNames(theResult.participants);
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of the participant you want removed");
 				break;
 //			case "endclock":
@@ -249,16 +249,11 @@ public class UserEditEvent extends SuperUser {
 							this.notificationConstructor.message = "You got invited to an event by" + " " + this.eventEditor.creator;
 							this.server.createNotification(this.notificationConstructor);
 							
-							this.eventEditor.privateCalendarName = nextInput + "'s Calendar";
-							ServerResult creator = this.server.createEvent(this.eventEditor);
 							
-							ServerEventsResult gotResult;
-							if(this.eventEditor.roomNumber != 0){
-								gotResult = this.server.getEventIdWithRoom(this.eventEditor);
-							}else{
-								gotResult = this.server.getEventIdWithoutRoom(this.eventEditor);
-							}
-							this.invitationConstructor.id = gotResult.eventId;
+							ServerResult creator = this.server.createPrivateCalendarEvent(nextInput + "'s Calendar", this.eventEditor.eventId);
+							
+							
+							this.invitationConstructor.id = this.eventEditor.eventId;
 							this.invitationConstructor.invitert = new User(nextInput);
 							this.server.createInvitation(this.invitationConstructor);
 							
@@ -276,6 +271,25 @@ public class UserEditEvent extends SuperUser {
 				this.state = State.ADD_MORE;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Username was too long, want to try again Y/N?");
 		
+			}
+			break;
+		case ENTER_DELETE:
+			if (nextInput.length() == 0){
+				this.state = State.ENTER_OPTION;
+				this.delegator.delegateIsReadyForNextInputWithPrompt("No deletion was done, enter new action");
+			}
+			if (nextInput.length() <= 45){
+				ServerFindUserResult result = this.server.findUser(nextInput);
+				if(result.userExists){
+					ServerFindUserResult theResult = this.server.isUserInvited(this.eventEditor);
+					if(theResult.userExists){
+						ServerResult gotResult = server.deleteParticipant(nextInput, this.eventEditor.eventId);
+						if (gotResult.didSucceed == true) {
+							
+						}
+					}
+					
+				}
 			}
 			break;
 		case ENTER_ENDDATE:
@@ -501,6 +515,7 @@ public class UserEditEvent extends SuperUser {
 		
 		return events.get(i);
 	}
+	
 	public int compareDates(Date date1, Date date2){
 		int year1 = date1.getYear()+1900;
 		int month1 = date1.getMonth();
@@ -542,6 +557,8 @@ public class UserEditEvent extends SuperUser {
 	}
 	
 	public void userAsksForHelp() {
+		switch(this.state){
 		
+		}
 	}
 }
