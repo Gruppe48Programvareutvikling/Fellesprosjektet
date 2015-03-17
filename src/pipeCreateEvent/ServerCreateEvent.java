@@ -31,7 +31,7 @@ public class ServerCreateEvent extends ServerManager {
 	private final String SQL_FIND_PRIVATE_CALENDAR_NAME = "Select privateCalendarName FROM PrivateCalendar WHERE userName =?";
 	private final String SQL_FIND_GROUPS_FROM_USERNAME = "Select groupName from GroupUsers where userName =?";
 	private final String SQL_FIND_GROUP_USERS_FROM_GROUP = "Select userName from GroupUsers where groupName=? and userName !=?";
-	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND (? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate) )";
+	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND ((? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate)) )";
 	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, description, startDate, endDate, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?)";
 	private final String SQL_FIND_GROUP_CALENDAR_NAME = "SELECT groupCalendarName FROM GroupCalendar WHERE groupName =?";
 	private final String SQL_CREATE_INVITATION = "INSERT INTO InvitesToEvent(userName,eventId,status) VALUES (?,?,?)";

@@ -422,7 +422,7 @@ public class UserCreateEvent extends SuperUser {
 		
 		
 		this.notificationConstructor.username = participants.get(0).username;
-		this.notificationConstructor.message = "Notification for your event:" + this.eventConstructor.name;
+		this.notificationConstructor.message = "Notification for your event:" + this.notificationConstructor.username;
 		this.server.createNotification(notificationConstructor);
 		
 		for (int i = 1; i < participants.size(); i++) {
