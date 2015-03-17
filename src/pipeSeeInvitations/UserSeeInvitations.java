@@ -3,6 +3,7 @@ package pipeSeeInvitations;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
 import serverReturnTypes.ServerInvitationsResult;
+import superClasses.ServerResult;
 import superClasses.SuperUser;
 
 public class UserSeeInvitations extends SuperUser {
@@ -64,7 +65,7 @@ public class UserSeeInvitations extends SuperUser {
 			this.invitationReply = nextInput.toLowerCase();
 		
 			if (this.invitationReply.equals("accept") || this.invitationReply.equals("decline") || this.invitationReply.equals("maybe")){
-				ServerInvitationsResult selection = this.server.respontoInvitation(selectedInvitation, invitationReply, User.currentUser().username);
+				ServerResult selection = this.server.respontoInvitation(selectedInvitation, invitationReply, User.currentUser().username);
 				if (selection.didSucceed = true){
 					System.out.println("Changes applied successfully.");
 					
