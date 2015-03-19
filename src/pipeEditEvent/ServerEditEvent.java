@@ -408,6 +408,7 @@ public class ServerEditEvent extends ServerEvents {
 			ServerCreateEvent.processSQLException(e);
 			result.didSucceed = false;
 			result.errorMessage = e.getMessage();
+			
 			}
 		}
 		return result;
