@@ -29,7 +29,7 @@ public class ServerEditEvent extends ServerEvents {
 	private final String SQL_FIND_PRIVATE_CALENDAR_NAME = "SELECT privateCalendarName FROM PrivateCalendar WHERE userName =?";
 	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND ((? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate)) )";
 	private final String SQL_FIND_USER = "Select userName from User where userName =?";
-	private final String SQL_ISINVITED = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
+	private final String SQL_ISINVITED = "Select * From PrivateCalendarEvent WHERE privateCalendarName IN (Select privateCalendarName FROM PrivateCalendar WHERE userName =? AND eventId =?)";
 	private final String SQL_LIST_OF_PARTICIPANTS = "Select userName From PrivateCalendar Where privateCalendarName IN(Select privateCalendarName FROM PrivateCalendarEvent WHERE eventId =?)";
 	//private final String SQL_LIST_OF_PARTICIPANTS = "SELECT privateCalendarName FROM PrivateCalendarEvent WHERE eventId =?";
 	private final String SQL_FIND_EVENTIDLIST = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?";
@@ -265,20 +265,16 @@ public class ServerEditEvent extends ServerEvents {
 		
 		return theResult;
 	} //Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)
-	public ServerFindUserResult isUserInvited(Event event){
+	public ServerFindUserResult isUserInvited(int eventId, String userName){
 		ServerFindUserResult theResult = new ServerFindUserResult();
 		ResultSet result = null;
 		try(
 			Connection connection = this.getDataBaseConnection();
 			PreparedStatement statement = connection.prepareStatement(SQL_ISINVITED, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		){
-			statement.setString(1, event.name);
-			statement.setString(2, event.description);
-			statement.setString(3, dateToString(event.startDate));
-			statement.setString(4, dateToString(event.endDate));
-			statement.setString(5, event.location);
-			statement.setString(6, event.creator);
-			statement.setInt(7, event.roomNumber);
+			statement.setInt(2, eventId);
+			statement.setString(1, userName);
+			
 			
 			result = statement.executeQuery();
 			
@@ -406,6 +402,7 @@ public class ServerEditEvent extends ServerEvents {
 				}
 		}catch (SQLException e) {
 			// TODO: handle exception
+			
 			ServerCreateEvent.processSQLException(e);
 			result.didSucceed = false;
 			result.errorMessage = e.getMessage();

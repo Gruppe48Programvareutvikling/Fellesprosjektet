@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import com.sun.javafx.scene.EnteredExitedHandler;
+
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
@@ -475,7 +477,36 @@ public class UserCreateEvent extends SuperUser {
 	}
 	
 	public void userAsksForHelp() {
-		
+		switch (this.state) { //ENTER_NAME, ENTER_DESCRIPTION, ENTER_STARTDATE, ENTER_ENDDATE, ENTER_SCLOCK, ENTER_ECLOCK, ENTER_GROUP_NAME ENTER_PRIVATE_CALENDAR_NAME, ENTER_GROUP_CALENDAR_NAME, ENTER_LOCATION, ENTER_Participants, ADD_MORE, ENTER_NUMBER_OF_SEATS, 
+		//ENTER_ROOM_NUMBER, ADD_TO_DATABASE
+		case ENTER_NAME:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of the event (max 200 characters)");
+			break;
+		case ENTER_DESCRIPTION:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the description of the event (max 200 characters)");
+		case ENTER_STARTDATE:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write date for your event dd/mm/yyyy");
+		case ENTER_ENDDATE:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write date for your event dd/mm/yyyy");
+		case ENTER_SCLOCK:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the time of the day hh.mm");
+		case ENTER_ECLOCK:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the time of the day hh.mm");
+		case ENTER_GROUP_NAME:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
+		case ADD_MORE: 
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants? Y/N");
+		case ENTER_Participants:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of the participant");
+		case ENTER_LOCATION:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of the location of your event (max 200 characters)");
+		case ENTER_NUMBER_OF_SEATS:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the number of desired seats");
+		case ENTER_ROOM_NUMBER:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Choose room number on the list");
+		default:
+			break;
+		}
 	}
 
 }

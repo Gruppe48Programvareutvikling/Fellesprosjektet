@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import dataStructures.Event;
 import dataStructures.Invitation;
 import dataStructures.Notification;
@@ -85,12 +86,7 @@ public class UserEditEvent extends SuperUser {
 				this.state = State.ENTER_STARTDATE;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter new startdate dd/mm/yyyy");
 				break;
-			case "privatecalendarname":
-				this.state = State.ENTER_PRIVATE_CALENDAR;
-				ServerGetCalendarsResult result = this.server.findPrivateCalendar(User.currentUser().username);
-				printCalendarNames(result.privateCalendarNames);
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of one of your private calendars");
-				break;
+			
 			case "delete":
 				this.state = State.ENTER_DELETE;
 				ServerFindUserResult theResult = this.server.Participants(this.eventEditor.eventId);
@@ -117,6 +113,8 @@ public class UserEditEvent extends SuperUser {
 				this.state = State.ENTER_NUMBER_OF_SEATS;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter desired number of seats");
 				break;
+			case "help":
+				userAsksForHelp();
 			default:
 				this.delegator.delegateIsDone("Exiting edit mode");
 				break;
@@ -241,7 +239,7 @@ public class UserEditEvent extends SuperUser {
 					//skjekk med server
 					ServerFindUserResult result = this.server.findUser(nextInput);
 					if (result.userExists == true){
-						ServerFindUserResult theResult = this.server.isUserInvited(eventEditor);
+						ServerFindUserResult theResult = this.server.isUserInvited(this.eventEditor.eventId, nextInput);
 						if (!(theResult.userExists)){ //skjekk om bruker allerede er i lista
 							
 							this.notificationConstructor.date = this.eventEditor.startDate;
@@ -250,7 +248,7 @@ public class UserEditEvent extends SuperUser {
 							this.server.createNotification(this.notificationConstructor);
 							
 							
-							ServerResult creator = this.server.createPrivateCalendarEvent(nextInput + "'s Calendar", this.eventEditor.eventId);
+							ServerResult creator = this.server.createPrivateCalendarEvent(nextInput, this.eventEditor.eventId);
 							
 							
 							this.invitationConstructor.id = this.eventEditor.eventId;
@@ -281,11 +279,12 @@ public class UserEditEvent extends SuperUser {
 			if (nextInput.length() <= 45){
 				ServerFindUserResult result = this.server.findUser(nextInput);
 				if(result.userExists){
-					ServerFindUserResult theResult = this.server.isUserInvited(this.eventEditor);
+					ServerFindUserResult theResult = this.server.isUserInvited(this.eventEditor.eventId, nextInput);
 					if(theResult.userExists){
 						ServerResult gotResult = server.deleteParticipant(nextInput, this.eventEditor.eventId);
 						if (gotResult.didSucceed == true) {
-							
+							this.state = State.ENTER_OPTION;
+							this.delegator.delegateIsReadyForNextInputWithPrompt("Participant is deleted");
 						}
 					}
 					
@@ -559,7 +558,45 @@ public class UserEditEvent extends SuperUser {
 	
 	public void userAsksForHelp() {
 		switch(this.state){
-		
+		case ENTER_NAME:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of the event (max 200 characters)");
+			break;
+		case ENTER_DESCRIPTION:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the description of the event (max 200 characters)");
+		case ENTER_STARTDATE:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write date for your event dd/mm/yyyy");
+		case ENTER_ENDDATE:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write date for your event dd/mm/yyyy");
+		case ENTER_SCLOCK:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the time of the day hh.mm");
+		case ENTER_ECLOCK:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the time of the day hh.mm");
+		case ENTER_DELETE:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the username of the participant you want to remove");
+		case ADD_MORE: 
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants? Y/N");
+		case ENTER_Participants:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of the participant");
+		case ENTER_LOCATION:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of the location of your event (max 200 characters)");
+		case ENTER_NUMBER_OF_SEATS:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the number of desired seats");
+		case ENTER_ROOM_NUMBER:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Choose room number on the list");
+		case ENTER_EVENTID:
+			this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the event id of the event you want to edit");
+		case ENTER_OPTION:
+			String currentOptions = "You currently have the following options:\n";
+			currentOptions += "- " + "name" + "\n";
+			currentOptions += "- " + "description" + "\n";
+			currentOptions += "- " +  "date"+ "\n";
+			currentOptions += "- " + "delete" + "\n";
+			currentOptions += "- " + "add" + "\n";
+			currentOptions += "- " + "location" + "\n";
+			currentOptions += "- " + "room" + "\n";
+			System.out.println(currentOptions);
+		default:
+			break;
 		}
 	}
 }
