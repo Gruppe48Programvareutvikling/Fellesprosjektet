@@ -284,7 +284,7 @@ public class UserEditEvent extends SuperUser {
 						ServerResult gotResult = server.deleteParticipant(nextInput, this.eventEditor.eventId);
 						if (gotResult.didSucceed == true) {
 							this.state = State.ENTER_OPTION;
-							this.delegator.delegateIsReadyForNextInputWithPrompt("Participant is deleted");
+							this.delegator.delegateIsReadyForNextInputWithPrompt("Participant is deleted, enter new action");
 						}
 					}
 					

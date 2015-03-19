@@ -403,9 +403,12 @@ public class ServerEditEvent extends ServerEvents {
 		}catch (SQLException e) {
 			// TODO: handle exception
 			
+			
+			if (!(e.getErrorCode() == 1062 && e.getSQLState().equals("23000"))){
 			ServerCreateEvent.processSQLException(e);
 			result.didSucceed = false;
 			result.errorMessage = e.getMessage();
+			}
 		}
 		return result;
 	}
