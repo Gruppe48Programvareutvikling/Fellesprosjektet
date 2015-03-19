@@ -49,6 +49,9 @@ public class UserCreateEvent extends SuperUser {
 	public void sendNextInput(String nextInput) {
 		switch (this.state){
 		case ENTER_NAME:
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			if (nextInput.length() <= 45){ 
 				this.eventConstructor.name = nextInput;
 				this.state = State.ENTER_DESCRIPTION;
@@ -65,6 +68,9 @@ public class UserCreateEvent extends SuperUser {
 			}
 			break;
 		case ENTER_DESCRIPTION:
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			if (nextInput.length() <=200){
 				this.eventConstructor.description = nextInput;
 				this.state = State.ENTER_STARTDATE;
@@ -76,6 +82,9 @@ public class UserCreateEvent extends SuperUser {
 			break;
 			
 		case ENTER_STARTDATE: //kommer inn som dd/mm/yyyy
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			int counter = 0;
 			for( int i=0; i<nextInput.length(); i++ ) {
 			    if( nextInput.charAt(i) == '/' ) {
@@ -126,6 +135,9 @@ public class UserCreateEvent extends SuperUser {
 			break;
 			
 		case ENTER_SCLOCK:
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			String[] sTime = nextInput.split("\\."); //maa lage test
 			
 				
@@ -150,6 +162,9 @@ public class UserCreateEvent extends SuperUser {
 					
 			break;
 		case ENTER_ENDDATE: //kommer inn som dd/mm/yyyy
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			counter = 0;
 			for( int i=0; i<nextInput.length(); i++ ) {
 			    if( nextInput.charAt(i) == '/' ) {
@@ -204,6 +219,9 @@ public class UserCreateEvent extends SuperUser {
 			}
 			break;
 		case ENTER_ECLOCK:
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			String[] sETime = nextInput.split("\\.");
 			
 				
@@ -232,6 +250,9 @@ public class UserCreateEvent extends SuperUser {
 					}
 							break;
 		case ENTER_LOCATION:
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			if (nextInput.length()<=45){
 				this.eventConstructor.location = nextInput;
 				this.state = State.ENTER_GROUP_NAME;
@@ -249,6 +270,9 @@ public class UserCreateEvent extends SuperUser {
 			}
 			break;
 		case ENTER_GROUP_NAME:
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			if (nextInput.length()<=45){
 				if(nextInput != null){
 					if(this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username).groupNames.contains(nextInput)){
@@ -268,7 +292,9 @@ public class UserCreateEvent extends SuperUser {
 			
 			break;
 		case ENTER_Participants:
-			
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			if (nextInput.length() <= 45){
 					//skjekk med server
 					ServerFindUserResult result = this.server.findUser(nextInput);
@@ -296,6 +322,9 @@ public class UserCreateEvent extends SuperUser {
 			}
 			break;
 		case ADD_MORE:
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			if (nextInput.equals("Y") || nextInput.equals("y")){
 				this.state = State.ENTER_Participants;
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of the participant");
@@ -308,6 +337,9 @@ public class UserCreateEvent extends SuperUser {
 			}
 			break;
 		case ENTER_NUMBER_OF_SEATS:
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			if (nextInput.length() <= 11){
 				try{if (nextInput.length() == 0){
 					this.eventConstructor.roomNumber = 0;
@@ -339,7 +371,9 @@ public class UserCreateEvent extends SuperUser {
 			}
 			break;
 		case ENTER_ROOM_NUMBER:
-			
+			if (nextInput == "help"){
+				userAsksForHelp();
+			}
 			if (nextInput.length() <= 11){
 				try{
 						if (this.server.findRoomResult(Integer.toString(possibleRoomNumber), this.eventConstructor.startDate, this.eventConstructor.endDate).roomNumber.contains(Integer.parseInt(nextInput))){ //maa endres
