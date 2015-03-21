@@ -24,14 +24,14 @@ public class ServerEditEvent extends ServerEvents {
 	
 	private final String SQL_GET_LIST_OF_EVENTS = "Select * FROM Event WHERE userName =?";
 	
-	private final String SQL_UPDATE_EVENT = "UPDATE Event SET name =?, description =?, startDate =?, endDate =?, privateCalendarName =?,"
+	private final String SQL_UPDATE_EVENT = "UPDATE Event SET name =?, description =?, startDate =?, endDate =?,"
 			+ "groupCalendarName =?, location =?, userName=?, roomnumber =? WHERE eventId =?";
 	private final String SQL_FIND_PRIVATE_CALENDAR_NAME = "SELECT privateCalendarName FROM PrivateCalendar WHERE userName =?";
 	private final String SQL_FIND_ROOM = "SELECT r1.roomNumber, r1.numberOfSeats FROM Room r1, Event e1 WHERE r1.numberOfSeats >= ? AND r1.roomNumber NOT IN ( SELECT r2.roomNumber FROM Event e2, Room r2 WHERE r2.roomNumber = e2.roomNumber AND ((? <= e2.startDate AND ? >= e2.startDate) OR (? <= e2.endDate AND  ? >= e2.startDate)) )";
 	private final String SQL_FIND_USER = "Select userName from User where userName =?";
 	private final String SQL_ISINVITED = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
-	//private final String SQL_LIST_OF_PARTICIPANTS = "Select userName From PrivateCalendar Where privateCalendarname IN(Select privateCalendarName From Event WHERE name =? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?)";
-	private final String SQL_LIST_OF_PARTICIPANTS = "SELECT userName FROM PrivateCalendarEvent WHERE eventId =?";
+	private final String SQL_LIST_OF_PARTICIPANTS = "Select userName From PrivateCalendar Where privateCalendarName IN(Select privateCalendarName FROM PrivateCalendarEvent WHERE eventId =?)";
+	//private final String SQL_LIST_OF_PARTICIPANTS = "SELECT privateCalendarName FROM PrivateCalendarEvent WHERE eventId =?";
 	private final String SQL_FIND_EVENTIDLIST = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND location =? AND userName=? AND roomNumber=?";
 	private final String SQL_CREATE_EVENT = "INSERT INTO Event(name, description, startDate, endDate, privateCalendarName, groupCalendarName,location,userName,roomNumber) VALUES (?,?,?,?,?,?,?,?,?)";
 	private final String SQL_CREATE_NOTIFICATION = "INSERT INTO Notification(date,message,userName) VALUES (?,?,?)";
@@ -39,7 +39,7 @@ public class ServerEditEvent extends ServerEvents {
 	private final String SQL_FIND_EVENTID_WITHOUT_ROOM = "Select eventId from Event WHERE name=? AND description =? AND startDate =? AND endDate =? AND privateCalendarName=? AND groupCalendarName =? AND location =? AND userName=? AND roomNumber IS NULL";
 	private final String SQL_CREATE_INVITATION = "INSERT INTO InvitesToEvent(userName,eventId,status) VALUES (?,?,?)";
 	private final String SQL_CREATE_PRIVATE_CALENDAR_EVENT = "INSERT INTO PrivateCalendarEvent(privateCalendarName, eventId) VALUES (?,?)";
-	private final String SQL_DELETE_PARTICIPANT = "DELETE FROM PrivateCalendarEvent WHERE privateCalendarName =? AND eventId =?";
+	private final String SQL_DELETE_PARTICIPANT = "DELETE FROM PrivateCalendarEvent WHERE eventId = ? AND privateCalendarName IN (Select p1.privateCalendarName From PrivateCalendar p1 Where userName = ?)";
 	
 	public ServerEventsResult getListOfEvents(String userName){
 		ServerEventsResult theResult = new ServerEventsResult();
@@ -66,9 +66,8 @@ public class ServerEditEvent extends ServerEvents {
 					eventConstructor.endDate = result.getTimestamp(5);
 					eventConstructor.endDate.setYear(eventConstructor.endDate.getYear());
 					eventConstructor.endDate.setMonth((eventConstructor.endDate.getMonth()));
-					eventConstructor.privateCalendarName = result.getString(6);
-					eventConstructor.groupCalendarName = result.getString(7);
-					eventConstructor.location = result.getString(8);
+					eventConstructor.groupCalendarName = result.getString(6);
+					eventConstructor.location = result.getString(7);
 					eventConstructor.roomNumber = result.getInt(9);
 					theResult.events.add(eventConstructor);
 					
@@ -98,17 +97,17 @@ public class ServerEditEvent extends ServerEvents {
 				statement.setString(2, eventToCreate.description);
 				statement.setString(3, dateToString(eventToCreate.startDate));
 				statement.setString(4, dateToString(eventToCreate.endDate));
-				statement.setString(5, eventToCreate.privateCalendarName);
-				statement.setString(6, eventToCreate.groupCalendarName);
-				statement.setString(7, eventToCreate.location);
-				statement.setString(8, eventToCreate.creator);
+				
+				statement.setString(5, eventToCreate.groupCalendarName);
+				statement.setString(6, eventToCreate.location);
+				statement.setString(7, eventToCreate.creator);
 				if (eventToCreate.roomNumber == 0){
-					statement.setNull(9, java.sql.Types.INTEGER);
+					statement.setNull(8, java.sql.Types.INTEGER);
 				}else{
-					statement.setInt(9, eventToCreate.roomNumber);
+					statement.setInt(8, eventToCreate.roomNumber);
 				}
 				
-				statement.setInt(10,eventToCreate.eventId);
+				statement.setInt(9,eventToCreate.eventId);
 				int affected = statement.executeUpdate();
 				if (affected == 1){
 					result.didSucceed = true;
@@ -280,7 +279,7 @@ public class ServerEditEvent extends ServerEvents {
 			statement.setString(5, event.location);
 			statement.setString(6, event.creator);
 			statement.setInt(7, event.roomNumber);
-			statement.setString(10, "userName IS NULL");
+			
 			result = statement.executeQuery();
 			
 			boolean gotResult = false;
@@ -439,14 +438,14 @@ public class ServerEditEvent extends ServerEvents {
 		
 		return result;
 	}
-	public ServerResult deleteParticipant(String privateCalendarName, int eventId){
+	public ServerResult deleteParticipant(String userName, int eventId){
 		ServerResult result = new ServerResult();
 		try(
 				Connection connection = this.getDataBaseConnection();
 				PreparedStatement statement = connection.prepareStatement(SQL_DELETE_PARTICIPANT, ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY)
 				){
-				statement.setString(1, privateCalendarName);
-				statement.setInt(2, eventId);
+				statement.setString(2, userName);
+				statement.setInt(1, eventId);
 				int affected = statement.executeUpdate();
 				if (affected == 1){
 					result.didSucceed = true;

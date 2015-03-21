@@ -57,8 +57,7 @@ public class UserEditEvent extends SuperUser {
 				if (listOfEventId.contains(num)){
 				
 					eventEditor = getEvent( listOfEvents, num);
-					ServerEventsResult result = this.server.getEventIdListWithRoom(this.eventEditor);
-					listOfEventId = result.eventIds;
+					
 					this.state = State.ENTER_OPTION;
 					this.delegator.delegateIsReadyForNextInputWithPrompt("What do you want to edit?");
 				}
@@ -94,7 +93,8 @@ public class UserEditEvent extends SuperUser {
 				break;
 			case "delete":
 				this.state = State.ENTER_DELETE;
-				
+				ServerFindUserResult theResult = this.server.Participants(this.eventEditor.eventId);
+				printCalendarNames(theResult.participants);
 				this.delegator.delegateIsReadyForNextInputWithPrompt("Enter the name of the participant you want removed");
 				break;
 //			case "endclock":
@@ -283,11 +283,15 @@ public class UserEditEvent extends SuperUser {
 				if(result.userExists){
 					ServerFindUserResult theResult = this.server.isUserInvited(this.eventEditor);
 					if(theResult.userExists){
-						
+						ServerResult gotResult = server.deleteParticipant(nextInput, this.eventEditor.eventId);
+						if (gotResult.didSucceed == true) {
+							
+						}
 					}
 					
 				}
 			}
+			break;
 		case ENTER_ENDDATE:
 			if (nextInput.length() == 0){
 				if (compareDates(this.eventEditor.startDate, this.eventEditor.endDate) >= 0) {
@@ -458,7 +462,8 @@ public class UserEditEvent extends SuperUser {
 						this.eventEditor.roomNumber = num;
 							
 						this.server.editEvent(this.eventEditor);
-							
+						this.state = State.ENTER_OPTION;
+						this.delegator.delegateIsReadyForNextInputWithPrompt("Room number has been changed");	
 							
 							
 							
@@ -482,7 +487,7 @@ public class UserEditEvent extends SuperUser {
 			System.out.println("Description:" + eventsToPrint.get(i).description);
 			System.out.println("Start date:" + eventsToPrint.get(i).startDate.toString());
 			System.out.println("End date:" + eventsToPrint.get(i).endDate.toString());
-			System.out.println("Private calendar name:" + eventsToPrint.get(i).privateCalendarName);
+			
 			System.out.println("Group Calendar Name:" + eventsToPrint.get(i).groupCalendarName);
 			System.out.println("Location:" + eventsToPrint.get(i).location);
 			System.out.println("Creator:" + eventsToPrint.get(i).creator);
@@ -511,6 +516,7 @@ public class UserEditEvent extends SuperUser {
 		
 		return events.get(i);
 	}
+	
 	public int compareDates(Date date1, Date date2){
 		int year1 = date1.getYear()+1900;
 		int month1 = date1.getMonth();
@@ -552,6 +558,8 @@ public class UserEditEvent extends SuperUser {
 	}
 	
 	public void userAsksForHelp() {
+		switch(this.state){
 		
+		}
 	}
 }

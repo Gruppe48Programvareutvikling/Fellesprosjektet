@@ -12,7 +12,6 @@ import dataStructures.Invitation;
 import dataStructures.Notification;
 import dataStructures.User;
 import mainControlStructure.ControllerInterface;
-import serverReturnTypes.ServerEventsResult;
 import serverReturnTypes.ServerFindGroupResult;
 import serverReturnTypes.ServerFindUserResult;
 import serverReturnTypes.ServerGetCalendarsResult;
@@ -88,6 +87,9 @@ public class UserCreateEvent extends SuperUser {
 			String sDay = date[0];
 			String sMonth = date[1];
 			String sYear = date[2];
+			if (sDay.length() != 2 || sMonth.length() != 2 || sYear.length() != 4 ){
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Wrong format. Please try again. dd/mm/yyyy");
+			}
 		
 			
 			try{
@@ -160,7 +162,9 @@ public class UserCreateEvent extends SuperUser {
 			String sEDay = eDate[0];
 			String sEMonth = eDate[1];
 			String sEYear = eDate[2];
-		
+			if (sEDay.length() != 2 || sEMonth.length() != 2 || sEYear.length() != 4 ){
+				this.delegator.delegateIsReadyForNextInputWithPrompt("Wrong format. Please try again. dd/mm/yyyy");
+			}
 			
 			try{
 				int day = Integer.parseInt(sEDay);
@@ -230,8 +234,12 @@ public class UserCreateEvent extends SuperUser {
 				this.eventConstructor.location = nextInput;
 				this.state = State.ENTER_GROUP_NAME;
 				ServerFindGroupResult result = this.server.getListOfGroupsTheUserIsPartOf(User.currentUser().username);
-				System.out.println(result.groupNames); //printe ut, har ikke laget toString
-				this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
+				System.out.println(result.groupNames); 
+				if (result.groupNames.size() == 0){
+					this.state = State.ADD_MORE;
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants? Y/N");
+				}
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Choose group you want to invite");
 				
 				
 			}else {
@@ -250,7 +258,7 @@ public class UserCreateEvent extends SuperUser {
 					
 					this.state = State.ADD_MORE;
 					this.eventConstructor.groupCalendarName = null;
-					this.delegator.delegateIsReadyForNextInputWithPrompt("Please write the username of additional the participant");
+					this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants? Y/N");
 				}
 			}else{
 				this.delegator.delegateIsReadyForNextInputWithPrompt("The name of the group was too long, try again");
@@ -272,7 +280,7 @@ public class UserCreateEvent extends SuperUser {
 							this.state = State.ADD_MORE;
 							this.delegator.delegateIsReadyForNextInputWithPrompt("Do you want to add additional participants Y/N?");
 						}
-						this.state = state.ADD_MORE;
+						this.state = State.ADD_MORE;
 						this.delegator.delegateIsReadyForNextInputWithPrompt("This user is already invited, want to try again? Y/N");
 					}else{
 						this.state = State.ADD_MORE;
@@ -419,7 +427,7 @@ public class UserCreateEvent extends SuperUser {
 		
 		
 		this.notificationConstructor.username = participants.get(0).username;
-		this.notificationConstructor.message = "Notification for your event:" + this.eventConstructor.name;
+		this.notificationConstructor.message = "Notification for your event:" + this.notificationConstructor.username;
 		this.server.createNotification(notificationConstructor);
 		
 		for (int i = 1; i < participants.size(); i++) {

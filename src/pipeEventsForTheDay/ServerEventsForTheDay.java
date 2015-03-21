@@ -10,9 +10,9 @@ import superClasses.ServerManager;
 
 public class ServerEventsForTheDay extends ServerManager {
 	
-	private final String SQL_GET_EVENT = ("select name, description, startDate, endDate, location, roomNumber "+
+	private final String SQL_GET_EVENT = ("select distinct(name), description, startDate, endDate, location, roomNumber "+
 										  "from InvitesToEvent,Event "+
-										  "where InvitesToEvent.userName=Event.userName and InvitesToEvent.userName=? and (select distinct(date(startDate)) from Event where date(startDate)=CURDATE())");
+										  "where InvitesToEvent.userName=Event.userName and InvitesToEvent.userName=? and (date(Event.startDate)<=CURDATE()) and (Event.endDate)>=NOW()");
 	
 	public ServerAvailabilityResult getEvent(String username){
 		ServerAvailabilityResult theResult = new ServerAvailabilityResult();
